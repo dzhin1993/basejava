@@ -7,40 +7,60 @@ public class ArrayStorage {
     private int size = 0;
 
     void clear() {
-        for (int i=0; i < size; i++){
-                storage[i] = null;
+        for (int i = 0; i < size; i++) {
+            storage[i] = null;
         }
         size = 0;
     }
 
-    void save(Resume r) {
-        for (int i=0; i < size; i++) {
-            if (storage[i].uuid.equals(r.uuid)){
-                return;
+    void update(Resume resume) {
+        if (resumeIsExistInStrorage(resume.uuid)) {
+            for (int i = 0; i < size; i++) {
+                if (storage[i].uuid.equals(resume.uuid)) {
+                    storage[i] = resume;
+                    break;
+                }
             }
+        } else {
+            System.out.println("Resume " + resume.uuid + " is not exist in storage");
         }
-        if (size < storage.length) {
-            storage[size] = r;
-            size++;
+    }
+
+    void save(Resume r) {
+        if (!resumeIsExistInStrorage(r.uuid)) {
+            if (size < storage.length) {
+                storage[size] = r;
+                size++;
+            }
+        } else {
+            System.out.println("Resume " + r.uuid + " is exist in storage");
         }
     }
 
     Resume get(String uuid) {
-        for (int i=0; i < size; i++) {
-            if (storage[i].uuid.equals(uuid)) {
-                return storage[i];
+        if (resumeIsExistInStrorage(uuid)) {
+            for (int i = 0; i < size; i++) {
+                if (storage[i].uuid.equals(uuid)) {
+                    return storage[i];
+                }
             }
+        } else {
+            System.out.println("Resume " + uuid + " is not exist in storage");
         }
         return null;
     }
 
     void delete(String uuid) {
-        for (int i = 0; i < size; i++) {
-            if (storage[i].uuid.equals(uuid)) {
-                size--;
-                System.arraycopy(storage, i + 1, storage, i, storage.length - i - 1);
-                break;
+        if (resumeIsExistInStrorage(uuid)) {
+            for (int i = 0; i < size; i++) {
+                if (storage[i].uuid.equals(uuid)) {
+                    size--;
+                    System.arraycopy(storage, i + 1, storage, i, storage.length - i - 1);
+                    break;
+                }
             }
+        } else {
+            System.out.println("Resume " + uuid + " is not exist in storage");
         }
     }
 
@@ -55,6 +75,15 @@ public class ArrayStorage {
 
     int size() {
         return size;
+    }
+
+    private boolean resumeIsExistInStrorage(String uuid) {
+        for (int i = 0; i < size; i++) {
+            if (storage[i].uuid.equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
