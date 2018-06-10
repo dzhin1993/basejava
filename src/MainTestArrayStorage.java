@@ -21,6 +21,11 @@ public class MainTestArrayStorage {
 
         System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
 
+        Resume r4  = new Resume();
+        r4.uuid = "uuid3";
+        ARRAY_STORAGE.update(r4);
+        System.out.println("Size after update: " + ARRAY_STORAGE.size());
+
         printAll();
         ARRAY_STORAGE.delete(r1.uuid);
         printAll();
