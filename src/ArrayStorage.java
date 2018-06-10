@@ -8,26 +8,26 @@ public class ArrayStorage {
     private int size = 0;
 
     void clear() {
-        Arrays.fill(storage, null);
+        Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
     void update(Resume resume) {
-        int i = getIndexFromStorage(resume.uuid);
-        if (i != -1) {
-            storage[i] = resume;
+        int index = getIndexFromStorage(resume.uuid);
+        if (index != -1) {
+            storage[index] = resume;
         } else {
             System.out.println("Resume " + resume.uuid + " is not exist in storage");
         }
     }
 
     void save(Resume r) {
-        if (size + 1 > storage.length) {
+        if (size >= storage.length) {
             System.out.println("the maximum storage size is exceeded");
             return;
         }
-        int i = getIndexFromStorage(r.uuid);
-        if (i == -1) {
+        int index = getIndexFromStorage(r.uuid);
+        if (index == -1) {
             storage[size++] = r;
         } else {
             System.out.println("Resume " + r.uuid + " is exist in storage");
@@ -35,9 +35,9 @@ public class ArrayStorage {
     }
 
     Resume get(String uuid) {
-        int i = getIndexFromStorage(uuid);
-        if (i != -1) {
-            return storage[i];
+        int index = getIndexFromStorage(uuid);
+        if (index != -1) {
+            return storage[index];
         } else {
             System.out.println("Resume " + uuid + " is not exist in storage");
         }
@@ -45,9 +45,9 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
-        int i = getIndexFromStorage(uuid);
-        if (i != -1) {
-            storage[i] = storage[size - 1];
+        int index = getIndexFromStorage(uuid);
+        if (index != -1) {
+            storage[index] = storage[size - 1];
             storage[size - 1] = null;
             size--;
         } else {
