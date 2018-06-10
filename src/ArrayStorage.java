@@ -8,7 +8,7 @@ public class ArrayStorage {
     private int size = 0;
 
     void clear() {
-        Arrays.fill(storage,null);
+        Arrays.fill(storage, null);
         size = 0;
     }
 
@@ -22,7 +22,7 @@ public class ArrayStorage {
     }
 
     void save(Resume r) {
-        if(size + 1 > storage.length){
+        if (size + 1 > storage.length) {
             System.out.println("the maximum storage size is exceeded");
             return;
         }
