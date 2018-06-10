@@ -3,16 +3,17 @@ import java.util.Arrays;
 /**
  * Array based storage for Resumes
  */
-public class ArrayStorage {
-    private Resume[] storage = new Resume[10000];
+public class ArrayStorage implements Storage{
+    private static final int STORAGE_LIMIT = 10000;
+    private final Resume[] storage = new Resume[STORAGE_LIMIT];
     private int size = 0;
 
-    void clear() {
+    public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
-    void update(Resume resume) {
+    public void update(Resume resume) {
         int index = getIndexFromStorage(resume.uuid);
         if (index != -1) {
             storage[index] = resume;
@@ -21,7 +22,7 @@ public class ArrayStorage {
         }
     }
 
-    void save(Resume r) {
+    public void save(Resume r) {
         if (size >= storage.length) {
             System.out.println("the maximum storage size is exceeded");
             return;
@@ -34,7 +35,7 @@ public class ArrayStorage {
         }
     }
 
-    Resume get(String uuid) {
+    public Resume get(String uuid) {
         int index = getIndexFromStorage(uuid);
         if (index != -1) {
             return storage[index];
@@ -44,7 +45,7 @@ public class ArrayStorage {
         return null;
     }
 
-    void delete(String uuid) {
+    public void delete(String uuid) {
         int index = getIndexFromStorage(uuid);
         if (index != -1) {
             storage[index] = storage[size - 1];
@@ -58,11 +59,11 @@ public class ArrayStorage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    Resume[] getAll() {
-     return Arrays.copyOfRange(storage,0,size);
+    public Resume[] getAll() {
+        return Arrays.copyOfRange(storage, 0, size);
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 
