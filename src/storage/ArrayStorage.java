@@ -7,10 +7,7 @@ import java.util.Arrays;
 /**
  * Array based storage for Resumes
  */
-public class ArrayStorage implements Storage {
-    private static final int STORAGE_LIMIT = 10000;
-    private final Resume[] storage = new Resume[STORAGE_LIMIT];
-    private int size = 0;
+public class ArrayStorage extends AbstractArrayStorage {
 
     public void clear() {
         Arrays.fill(storage, 0, size, null);
@@ -27,7 +24,7 @@ public class ArrayStorage implements Storage {
     }
 
     public void save(Resume r) {
-        if (size >= storage.length) {
+        if (size >= STORAGE_LIMIT) {
             System.out.println("the maximum storage size is exceeded");
             return;
         }
@@ -39,15 +36,6 @@ public class ArrayStorage implements Storage {
         }
     }
 
-    public Resume get(String uuid) {
-        int index = getIndexFromStorage(uuid);
-        if (index != -1) {
-            return storage[index];
-        } else {
-            System.out.println("model.Resume " + uuid + " is not exist in storage");
-        }
-        return null;
-    }
 
     public void delete(String uuid) {
         int index = getIndexFromStorage(uuid);
@@ -67,11 +55,8 @@ public class ArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    public int size() {
-        return size;
-    }
 
-    private int getIndexFromStorage(String uuid) {
+    protected int getIndexFromStorage(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
