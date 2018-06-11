@@ -1,3 +1,7 @@
+package storage;
+
+import model.Resume;
+
 import java.util.Arrays;
 
 /**
@@ -18,7 +22,7 @@ public class ArrayStorage implements Storage {
         if (index != -1) {
             storage[index] = resume;
         } else {
-            System.out.println("Resume " + resume.getUuid() + " is not exist in storage");
+            System.out.println("model.Resume " + resume.getUuid() + " is not exist in storage");
         }
     }
 
@@ -31,7 +35,7 @@ public class ArrayStorage implements Storage {
         if (index == -1) {
             storage[size++] = r;
         } else {
-            System.out.println("Resume " + r.getUuid() + " is exist in storage");
+            System.out.println("model.Resume " + r.getUuid() + " is exist in storage");
         }
     }
 
@@ -40,7 +44,7 @@ public class ArrayStorage implements Storage {
         if (index != -1) {
             return storage[index];
         } else {
-            System.out.println("Resume " + uuid + " is not exist in storage");
+            System.out.println("model.Resume " + uuid + " is not exist in storage");
         }
         return null;
     }
@@ -52,7 +56,7 @@ public class ArrayStorage implements Storage {
             storage[size - 1] = null;
             size--;
         } else {
-            System.out.println("Resume " + uuid + " is not exist in storage");
+            System.out.println("model.Resume " + uuid + " is not exist in storage");
         }
     }
 

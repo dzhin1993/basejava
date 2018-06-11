@@ -10,7 +10,7 @@
  
 ## Сериализация
 - <a href="http://www.intuit.ru/studies/courses/16/16/lecture/27133?page=3">Сериализация объектов (serialization)</a>
-- Реализация Storage используя <a href="https://habrahabr.ru/post/60317/">сериализацию</a>.
+- Реализация storage.Storage используя <a href="https://habrahabr.ru/post/60317/">сериализацию</a>.
  
 ## NIO
 - <a href="http://www.quizful.net/post/java-nio-tutorial">NIO Java 7</a>
@@ -21,5 +21,5 @@
 
 ## Домашнее задание
 - Сделать рекурсивный вывод каталогов с отступом
-- Реализовать Storage через java.nio.file.Path.
+- Реализовать storage.Storage через java.nio.file.Path.
 - Сделать возможным выбор меджу FileStorage и PathStorage для сериализации через ObjectStream.

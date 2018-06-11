@@ -1,18 +1,20 @@
+package model;
+
 import java.util.Objects;
 
 /**
- * com.urise.webapp.model.Resume class
+ * com.urise.webapp.model.model.Resume class
  */
 public class Resume {
 
     // Unique identifier
-   private String uuid;
+    private String uuid;
 
-    String getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    void setUuid(String uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
