@@ -16,7 +16,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void update(Resume resume) {
-        int index = getIndexFromStorage(resume.getUuid());
+        int index = getIndex(resume.getUuid());
         if (index != -1) {
             storage[index] = resume;
         } else {
@@ -30,7 +30,7 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("the maximum storage size is exceeded");
             return;
         }
-        int index = getIndexFromStorage(r.getUuid());
+        int index = getIndex(r.getUuid());
         if (index < 0) {
            insertResume(r,index);
         } else {
@@ -43,7 +43,7 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public Resume get(String uuid) {
-        int index = getIndexFromStorage(uuid);
+        int index = getIndex(uuid);
         if (index != -1) {
             return storage[index];
         } else {
@@ -54,7 +54,7 @@ public abstract class AbstractArrayStorage implements Storage {
 
     @Override
     public void delete(String uuid) {
-        int index = getIndexFromStorage(uuid);
+        int index = getIndex(uuid);
         if (index >= 0) {
            removeResume(index);
         } else {
@@ -69,7 +69,7 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    protected abstract int getIndexFromStorage(String uuid);
+    protected abstract int getIndex(String uuid);
 
     protected abstract void insertResume(Resume resume, int index);
 
