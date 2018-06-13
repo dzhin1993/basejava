@@ -60,7 +60,6 @@ public class MainTestArrayStorage {
         }
         long timeAfter = System.currentTimeMillis();
         System.out.println("time:" + (timeAfter - timeBefore) + " ms");
-        System.out.println(storage.size());
     }
 
     private static void printAll(Storage storage) {
