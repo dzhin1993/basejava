@@ -47,6 +47,20 @@ public class MainTestArrayStorage {
         printAll(storage);
 
         System.out.println("Size: " + storage.size());
+
+        long timeBefore = System.currentTimeMillis();
+        for (int i = 0; i <= 10000; i++) {
+            Resume r = new Resume();
+            r.setUuid(String.valueOf(i));
+            storage.save(r);
+        }
+        System.out.println(storage.size());
+        for (int i = 0; i < 10000; i++) {
+            storage.delete(String.valueOf(i));
+        }
+        long timeAfter = System.currentTimeMillis();
+        System.out.println("time:" + (timeAfter - timeBefore) + " ms");
+        System.out.println(storage.size());
     }
 
     private static void printAll(Storage storage) {
