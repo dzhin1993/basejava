@@ -10,11 +10,13 @@ public abstract class AbstractArrayStorage implements Storage {
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
 
+    @Override
     public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
+    @Override
     public void update(Resume resume) {
         int index = getIndex(resume.getUuid());
         if (index >= 0) {
@@ -25,31 +27,32 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public void save(Resume r) {
+    public void save(Resume resume) {
         if (size >= STORAGE_LIMIT) {
             System.out.println("the maximum storage size is exceeded");
             return;
         }
-        int index = getIndex(r.getUuid());
+        int index = getIndex(resume.getUuid());
         if (index < 0) {
-           insertResume(r,index);
+            insertResume(resume, index);
             size++;
         } else {
-            System.out.println("Resume " + r.getUuid() + " is exist in storage");
+            System.out.println("Resume " + resume.getUuid() + " is exist in storage");
         }
     }
 
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index >= 0) {
             return storage[index];
-        } else {
-            System.out.println("Resume " + uuid + " is not exist in storage");
         }
+        System.out.println("Resume " + uuid + " is not exist in storage");
         return null;
     }
 
@@ -57,7 +60,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index >= 0) {
-           removeResume(index);
+            removeResume(index);
             storage[size - 1] = null;
             size--;
         } else {
@@ -68,6 +71,7 @@ public abstract class AbstractArrayStorage implements Storage {
     /**
      * @return array, contains only Resumes in storage (without null)
      */
+    @Override
     public Resume[] getAll() {
         return Arrays.copyOfRange(storage, 0, size);
     }
