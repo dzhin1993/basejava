@@ -77,7 +77,7 @@
 
 ![finish](https://user-images.githubusercontent.com/29703461/38275669-3e621614-379b-11e8-8b3a-8e0a3ad4c65c.png)
 
-- Реализуйте класс `storage.ArrayStorage`, организовав хранение резюме на основе массива с методами `save, get, delete, size, clear, getAll`
+- Реализуйте класс `storage.ArrayStorageTest`, организовав хранение резюме на основе массива с методами `save, get, delete, size, clear, getAll`
 - При этом храните все резюме в начале `storage` (без дырок в виде `null`), чтобы не перебирать каждый раз все 10000 элементов
 ```
 Схема хранения резюме в storage (от 0 до size - 1 элементов null нет):
