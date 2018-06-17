@@ -1,14 +1,10 @@
 package storage;
 
-import exception.ExistStorageException;
-import exception.NotExistStorageException;
-import exception.StorageException;
 import model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
-    protected static final int STORAGE_LIMIT = 10000;
+public abstract class AbstractArrayStorage extends AbstractStorage {
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
@@ -20,54 +16,21 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public void update(Resume resume) {
-        int index = getIndex(resume.getUuid());
-        if (index >= 0) {
-            storage[index] = resume;
-        } else {
-            throw new NotExistStorageException(resume.getUuid());
-        }
-    }
-
-    @Override
-    public void save(Resume resume) {
-        if (size == STORAGE_LIMIT) {
-            throw new StorageException("Storage overflow", resume.getUuid());
-        }
-        int index = getIndex(resume.getUuid());
-        if (index < 0) {
-            insertResume(resume, index);
-            size++;
-        } else {
-            throw new ExistStorageException(resume.getUuid());
-        }
-    }
-
-    @Override
     public int size() {
         return size;
     }
 
     @Override
-    public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index >= 0) {
-            return storage[index];
-        }else {
-            throw new NotExistStorageException(uuid);
-        }
+    protected void deleteResume(int index) {
+        removeResume(index);
+        storage[size - 1] = null;
+        size--;
     }
 
     @Override
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index >= 0) {
-            removeResume(index);
-            storage[size - 1] = null;
-            size--;
-        } else {
-            throw new NotExistStorageException(uuid);
-        }
+    protected void addResume(Resume resume, int index) {
+        insertResume(resume, index);
+        size++;
     }
 
     /**
@@ -78,9 +41,13 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    protected abstract int getIndex(String uuid);
+    @Override
+    protected void updateResume(int index, Resume resume) {
+        storage[index] = resume;
+    }
 
-    protected abstract void insertResume(Resume resume, int index);
-
-    protected abstract void removeResume(int index);
+    @Override
+    protected Resume getResume(int index) {
+        return storage[index];
+    }
 }
