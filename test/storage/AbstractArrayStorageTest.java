@@ -11,7 +11,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 
-public class AbstractArrayStorageTest {
+public abstract class AbstractArrayStorageTest {
 
     private Storage storage;
 
@@ -24,7 +24,7 @@ public class AbstractArrayStorageTest {
     private static final Resume R3 = new Resume(UUID_3);
     private static final Resume R4 = new Resume(UUID_4);
 
-    AbstractArrayStorageTest(Storage storage) {
+    protected AbstractArrayStorageTest(Storage storage) {
         this.storage = storage;
     }
 
@@ -69,10 +69,9 @@ public class AbstractArrayStorageTest {
     public void saveStorageOverflow() {
         try {
             for (int i = 4; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                Resume currentResume = new Resume();
-                storage.save(currentResume);
+                storage.save(new Resume());
             }
-        }catch (StorageException e){
+        } catch (StorageException e) {
             fail();
         }
         storage.save(R4);
