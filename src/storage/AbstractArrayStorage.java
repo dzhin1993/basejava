@@ -1,10 +1,12 @@
 package storage;
 
+import exception.StorageException;
 import model.Resume;
 
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
+    protected static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
@@ -20,19 +22,6 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return size;
     }
 
-    @Override
-    protected void deleteResume(int index) {
-        removeResume(index);
-        storage[size - 1] = null;
-        size--;
-    }
-
-    @Override
-    protected void addResume(Resume resume, int index) {
-        insertResume(resume, index);
-        size++;
-    }
-
     /**
      * @return array, contains only Resumes in storage (without null)
      */
@@ -42,12 +31,32 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected void updateResume(int index, Resume resume) {
-        storage[index] = resume;
+    protected void updateResume(int key, Resume resume) {
+        storage[key] = resume;
     }
 
     @Override
-    protected Resume getResume(int index) {
-        return storage[index];
+    protected void saveResume(Resume resume) {
+        if (size == STORAGE_LIMIT) {
+            throw new StorageException("Storage overflow", resume.getUuid());
+        }
+        insertResume(resume, getKey(resume.getUuid()));
+        size++;
     }
+
+    @Override
+    protected Resume getResume(int key) {
+        return storage[key];
+    }
+
+    @Override
+    protected void deleteResume(int key) {
+        removeResume(key);
+        storage[size - 1] = null;
+        size--;
+    }
+
+    protected abstract void insertResume(Resume resume, int index);
+
+    protected abstract void removeResume(int index);
 }

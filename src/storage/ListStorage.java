@@ -5,37 +5,7 @@ import model.Resume;
 import java.util.ArrayList;
 
 public class ListStorage extends AbstractStorage {
-    private final ArrayList<Resume> listStorage = new ArrayList<>(STORAGE_LIMIT);
-
-    @Override
-    protected int getIndex(String uuid) {
-        for (Resume resume : listStorage) {
-            if (resume.getUuid().equals(uuid)) {
-                return listStorage.indexOf(resume);
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    protected void updateResume(int index, Resume resume) {
-        listStorage.set(index, resume);
-    }
-
-    @Override
-    protected Resume getResume(int index) {
-        return listStorage.get(index);
-    }
-
-    @Override
-    protected void insertResume(Resume resume, int index) {
-        addResume(resume, index);
-    }
-
-    @Override
-    protected void removeResume(int index) {
-        deleteResume(index);
-    }
+    private final ArrayList<Resume> listStorage = new ArrayList<>();
 
     @Override
     public void clear() {
@@ -53,12 +23,32 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void deleteResume(int index) {
-        listStorage.remove(index);
+    protected void updateResume(int key, Resume resume) {
+        listStorage.set(key, resume);
     }
 
     @Override
-    protected void addResume(Resume resume, int index) {
+    protected void saveResume(Resume resume) {
         listStorage.add(resume);
+    }
+
+    @Override
+    protected Resume getResume(int key) {
+        return listStorage.get(key);
+    }
+
+    @Override
+    protected void deleteResume(int key) {
+        listStorage.remove(key);
+    }
+
+    @Override
+    protected int getKey(String uuid) {
+        for (int i = 0; i < size(); i++) {
+            if (listStorage.get(i).getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

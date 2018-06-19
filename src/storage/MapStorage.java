@@ -5,41 +5,31 @@ import model.Resume;
 import java.util.HashMap;
 
 public class MapStorage extends AbstractStorage {
-    private HashMap<String, Resume> mapStorage = new HashMap<>(STORAGE_LIMIT);
+    private HashMap<String, Resume> mapStorage = new HashMap<>();
 
     @Override
-    protected int getIndex(String uuid) {
-        return 0;
-    }
-
-    @Override
-    protected void updateResume(int index, Resume resume) {
+    protected void updateResume(int key, Resume resume) {
 
     }
 
     @Override
-    protected Resume getResume(int index) {
+    protected void saveResume(Resume resume) {
+
+    }
+
+    @Override
+    protected Resume getResume(int key) {
         return null;
     }
 
     @Override
-    protected void deleteResume(int index) {
+    protected void deleteResume(int key) {
 
     }
 
     @Override
-    protected void addResume(Resume resume, int index) {
-
-    }
-
-    @Override
-    protected void insertResume(Resume resume, int index) {
-
-    }
-
-    @Override
-    protected void removeResume(int index) {
-
+    protected int getKey(String uuid) {
+        return 0;
     }
 
     @Override
