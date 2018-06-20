@@ -4,11 +4,16 @@ import model.Resume;
 
 import java.util.HashMap;
 
-public class MapStorage extends AbstractStorage {
+public class MapStorage extends AbstractStorage  {
     private HashMap<String, Resume> mapStorage = new HashMap<>();
 
     @Override
-    protected void updateResume(int key, Resume resume) {
+    protected boolean containsKey(Object key) {
+        return false;
+    }
+
+    @Override
+    protected void updateResume(Object key, Resume resume) {
 
     }
 
@@ -18,18 +23,18 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(int key) {
+    protected Resume getResume(Object key) {
         return null;
     }
 
     @Override
-    protected void deleteResume(int key) {
+    protected void deleteResume(Object key) {
 
     }
 
     @Override
-    protected int getKey(String uuid) {
-        return 0;
+    protected Object getKey(String uuid) {
+        return null;
     }
 
     @Override
