@@ -2,27 +2,29 @@ package storage;
 
 import exception.ExistStorageException;
 import exception.NotExistStorageException;
-import exception.StorageException;
 import model.Resume;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public abstract class AbstractStorageTest {
 
-    private Storage storage;
+    protected Storage storage;
 
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
     private static final String UUID_3 = "uuid3";
     private static final String UUID_4 = "uuid4";
-    private static final Resume R1 = new Resume(UUID_1);
-    private static final Resume R2 = new Resume(UUID_2);
-    private static final Resume R3 = new Resume(UUID_3);
-    private static final Resume R4 = new Resume(UUID_4);
+    private static final Resume R1 = new Resume(UUID_1, "Аня");
+    private static final Resume R2 = new Resume(UUID_2, "Вася");
+    private static final Resume R3 = new Resume(UUID_3, "Петя");
+    static final Resume R4 = new Resume(UUID_4, "Коля");
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -31,9 +33,9 @@ public abstract class AbstractStorageTest {
     @Before
     public void setUp() {
         storage.clear();
-        storage.save(R1);
-        storage.save(R2);
         storage.save(R3);
+        storage.save(R2);
+        storage.save(R1);
     }
 
 
@@ -65,18 +67,6 @@ public abstract class AbstractStorageTest {
         storage.save(R3);
     }
 
-    @Test(expected = StorageException.class)
-    public void saveStorageOverflow() {
-        try {
-            for (int i = 4; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume());
-            }
-        } catch (StorageException e) {
-            fail();
-        }
-        storage.save(R4);
-    }
-
     @Test
     public void size() {
         assertEquals(3, storage.size());
@@ -105,7 +95,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void getAll() {
-        Resume[] resumes = new Resume[]{R1, R2, R3};
-        assertArrayEquals(resumes, storage.getAll());
+        List<Resume> actual = Arrays.asList(R1, R2, R3);
+        assertThat(actual, is(storage.getAllSorted()));
     }
 }

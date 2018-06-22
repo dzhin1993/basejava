@@ -4,6 +4,9 @@ import exception.StorageException;
 import model.Resume;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10000;
@@ -26,8 +29,10 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     @Override
-    public Resume[] getAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    public List<Resume> getAllSorted() {
+        return Arrays.stream(Arrays.copyOfRange(storage, 0, size))
+                .sorted(Comparator.comparing(Resume::getFullName))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -40,7 +45,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         if (size == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", resume.getUuid());
         }
-        insertResume(resume, (Integer) getKey(resume.getUuid()));
+        insertResume(resume, (Integer) getSearchKey(resume.getUuid()));
         size++;
     }
 
@@ -57,8 +62,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean containsKey(Object key) {
-        return (Integer) key >= 0;
+    protected boolean containsSearchKey(Object searchKey) {
+        return (Integer) searchKey >= 0;
     }
 
     protected abstract void insertResume(Resume resume, int index);
