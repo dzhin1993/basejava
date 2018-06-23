@@ -2,17 +2,21 @@ package storage;
 
 import model.Resume;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class MapResumeStorage extends AbstractStorage {
+public class MapResumeStorage extends AbstractStorage<Resume> {
     private HashMap<String, Resume> mapStorage = new HashMap<>();
 
     @Override
-    protected void updateResume(Object key, Resume resume) {
-        mapStorage.put(((Resume) key).getUuid(), resume);
+    protected List<Resume> getResumeList() {
+        return new ArrayList<>(mapStorage.values());
+    }
+
+    @Override
+    protected void updateResume(Resume searchKey, Resume resume) {
+        mapStorage.put(searchKey.getUuid(), resume);
     }
 
     @Override
@@ -21,13 +25,13 @@ public class MapResumeStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object key) {
-        return mapStorage.get(((Resume) key).getUuid());
+    protected Resume getResume(Resume searchKey) {
+        return mapStorage.get(searchKey.getUuid());
     }
 
     @Override
-    protected void deleteResume(Object key) {
-        mapStorage.remove(((Resume) key).getUuid());
+    protected void deleteResume(Resume searchKey) {
+        mapStorage.remove(searchKey.getUuid());
     }
 
     @Override
@@ -36,26 +40,17 @@ public class MapResumeStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return mapStorage
-                .values()
-                .stream()
-                .sorted(Comparator.comparing(Resume::getFullName))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public int size() {
         return mapStorage.size();
     }
 
     @Override
-    protected boolean containsSearchKey(Object searchKey) {
+    protected boolean containsSearchKey(Resume searchKey) {
         return searchKey != null;
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected Resume getSearchKey(String uuid) {
         return mapStorage.get(uuid);
     }
 }

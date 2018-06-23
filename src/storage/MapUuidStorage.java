@@ -2,17 +2,21 @@ package storage;
 
 import model.Resume;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class MapUuidStorage extends AbstractStorage {
+public class MapUuidStorage extends AbstractStorage<String> {
     private HashMap<String, Resume> mapStorage = new HashMap<>();
 
     @Override
-    protected void updateResume(Object key, Resume resume) {
-        mapStorage.put((String) key, resume);
+    protected List<Resume> getResumeList() {
+        return new ArrayList<>(mapStorage.values());
+    }
+
+    @Override
+    protected void updateResume(String searchKey, Resume resume) {
+        mapStorage.put(searchKey, resume);
     }
 
     @Override
@@ -21,13 +25,13 @@ public class MapUuidStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object key) {
-        return mapStorage.get((String) key);
+    protected Resume getResume(String searchKey) {
+        return mapStorage.get(searchKey);
     }
 
     @Override
-    protected void deleteResume(Object key) {
-        mapStorage.remove((String) key);
+    protected void deleteResume(String searchKey) {
+        mapStorage.remove(searchKey);
     }
 
     @Override
@@ -36,26 +40,17 @@ public class MapUuidStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return mapStorage
-                .values()
-                .stream()
-                .sorted(Comparator.comparing(Resume::getFullName))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public int size() {
         return mapStorage.size();
     }
 
     @Override
-    protected boolean containsSearchKey(Object searchKey) {
-        return mapStorage.containsKey((String) searchKey);
+    protected boolean containsSearchKey(String searchKey) {
+        return mapStorage.containsKey(searchKey);
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected String getSearchKey(String uuid) {
         return uuid;
     }
 }

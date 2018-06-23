@@ -4,7 +4,11 @@ import exception.ExistStorageException;
 import exception.NotExistStorageException;
 import model.Resume;
 
-public abstract class AbstractStorage implements Storage {
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public abstract class AbstractStorage<key> implements Storage {
     @Override
     public void update(Resume resume) {
         updateResume(checkExistence(resume.getUuid()), resume);
@@ -26,9 +30,16 @@ public abstract class AbstractStorage implements Storage {
         deleteResume(checkExistence(uuid));
     }
 
+    @Override
+    public List<Resume> getAllSorted() {
+        List<Resume> resumeList = getResumeList();
+        resumeList.sort(Comparator.comparing(Resume::getFullName));
+        return resumeList;
+    }
 
-    private Object checkExistence(String uuid) {
-        Object key = getSearchKey(uuid);
+
+    private key checkExistence(String uuid) {
+        key key = getSearchKey(uuid);
         if (!containsSearchKey(key)) {
             throw new NotExistStorageException(uuid);
         }
@@ -41,16 +52,18 @@ public abstract class AbstractStorage implements Storage {
         }
     }
 
-    protected abstract boolean containsSearchKey(Object searchKey);
+    protected abstract List<Resume> getResumeList();
 
-    protected abstract void updateResume(Object key, Resume resume);
+    protected abstract void updateResume(key searchKey, Resume resume);
 
     protected abstract void saveResume(Resume resume);
 
-    protected abstract Resume getResume(Object key);
+    protected abstract Resume getResume(key searchKey);
 
-    protected abstract void deleteResume(Object key);
+    protected abstract void deleteResume(key searchKey);
 
-    protected abstract Object getSearchKey(String uuid);
+    protected abstract boolean containsSearchKey(key searchKey);
+
+    protected abstract key getSearchKey(String uuid);
 
 }

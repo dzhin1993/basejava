@@ -1,13 +1,10 @@
 package storage;
 
 import model.Resume;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ListStorage extends AbstractStorage {
+public class ListStorage extends AbstractStorage<Integer> {
     private final List<Resume> listStorage = new ArrayList<>();
 
     @Override
@@ -16,18 +13,18 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return listStorage.stream().sorted(Comparator.comparing(Resume::getFullName)).collect(Collectors.toList());
-    }
-
-    @Override
     public int size() {
         return listStorage.size();
     }
 
     @Override
-    protected void updateResume(Object key, Resume resume) {
-        listStorage.set((Integer) key, resume);
+    protected List<Resume> getResumeList() {
+        return listStorage;
+    }
+
+    @Override
+    protected void updateResume(Integer searchKey, Resume resume) {
+        listStorage.set(searchKey, resume);
     }
 
     @Override
@@ -36,18 +33,18 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getResume(Object key) {
-        return listStorage.get((Integer) key);
+    protected Resume getResume(Integer searchKey) {
+        return listStorage.get(searchKey);
     }
 
     @Override
-    protected void deleteResume(Object key) {
-        int index = (Integer) key;
+    protected void deleteResume(Integer searchKey) {
+        int index = searchKey;
         listStorage.remove(index);
     }
 
     @Override
-    protected boolean containsSearchKey(Object searchKey) {
+    protected boolean containsSearchKey(Integer searchKey) {
         return searchKey != null;
     }
 

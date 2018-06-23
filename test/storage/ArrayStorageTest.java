@@ -20,6 +20,6 @@ public class ArrayStorageTest extends AbstractStorageTest {
         } catch (StorageException e) {
             fail();
         }
-        storage.save(R4);
+        storage.save(new Resume());
     }
 }
