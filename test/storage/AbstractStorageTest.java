@@ -22,7 +22,7 @@ public abstract class AbstractStorageTest {
     private static final String UUID_3 = "uuid3";
     private static final String UUID_4 = "uuid4";
     private static final Resume R1 = new Resume(UUID_1, "Аня");
-    private static final Resume R2 = new Resume(UUID_2, "Вася");
+    private static final Resume R2 = new Resume(UUID_2, "Аня");
     private static final Resume R3 = new Resume(UUID_3, "Петя");
     private static final Resume R4 = new Resume(UUID_4, "Коля");
 

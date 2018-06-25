@@ -3,9 +3,6 @@ package model;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * com.urise.webapp.model.model.Resume class
- */
 public class Resume{
 
     // Unique identifier

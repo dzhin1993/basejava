@@ -6,7 +6,7 @@ import model.Resume;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10000;
 
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -28,8 +28,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
      */
 
     @Override
-    protected void updateResume(Integer searchKey, Resume resume) {
-        storage[searchKey] = resume;
+    protected void updateResume(Object searchKey, Resume resume) {
+        storage[(Integer) searchKey] = resume;
     }
 
     @Override
@@ -37,25 +37,25 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
         if (size == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", resume.getUuid());
         }
-        insertResume(resume, getSearchKey(resume.getUuid()));
+        insertResume(resume, (Integer) getSearchKey(resume.getUuid()));
         size++;
     }
 
     @Override
-    protected Resume getResume(Integer searchKey) {
-        return storage[searchKey];
+    protected Resume getResume(Object searchKey) {
+        return storage[(Integer) searchKey];
     }
 
     @Override
-    protected void deleteResume(Integer searchKey) {
-        removeResume(searchKey);
+    protected void deleteResume(Object searchKey) {
+        removeResume((Integer) searchKey);
         storage[size - 1] = null;
         size--;
     }
 
     @Override
-    protected boolean containsSearchKey(Integer searchKey) {
-        return searchKey >= 0;
+    protected boolean containsSearchKey(Object searchKey) {
+        return (Integer) searchKey >= 0;
     }
 
     @Override
