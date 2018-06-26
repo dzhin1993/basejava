@@ -20,7 +20,7 @@ public class MapResumeStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume) {
+    protected void saveResume(Object searchKey, Resume resume) {
         mapStorage.put(resume.getUuid(), resume);
     }
 
@@ -45,12 +45,12 @@ public class MapResumeStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean containsSearchKey(Object searchKey) {
+    protected boolean isContains(Object searchKey) {
         return searchKey != null;
     }
 
     @Override
-    protected Resume getSearchKey(String uuid) {
-        return mapStorage.get(uuid);
+    protected Resume getSearchKey(String key) {
+        return mapStorage.get(key);
     }
 }

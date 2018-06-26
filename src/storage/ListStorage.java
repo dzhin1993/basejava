@@ -1,6 +1,7 @@
 package storage;
 
 import model.Resume;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected List<Resume> getResumeList() {
-        return listStorage;
+        return new ArrayList<>(listStorage);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume resume) {
+    protected void saveResume(Object searchKey, Resume resume) {
         listStorage.add(resume);
     }
 
@@ -39,19 +40,18 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected void deleteResume(Object searchKey) {
-        int index = (Integer) searchKey;
-        listStorage.remove(index);
+        listStorage.remove(((Integer) searchKey).intValue());
     }
 
     @Override
-    protected boolean containsSearchKey(Object searchKey) {
+    protected boolean isContains(Object searchKey) {
         return searchKey != null;
     }
 
     @Override
-    protected Integer getSearchKey(String uuid) {
+    protected Integer getSearchKey(String key) {
         for (int i = 0; i < size(); i++) {
-            if (listStorage.get(i).getUuid().equals(uuid)) {
+            if (listStorage.get(i).getUuid().equals(key)) {
                 return i;
             }
         }
