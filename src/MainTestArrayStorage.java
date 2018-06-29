@@ -19,12 +19,9 @@ public class MainTestArrayStorage {
     }
 
     private static void testStorage(Storage storage) {
-        Resume r1 = new Resume();
-        r1.setUuid("uuid1");
-        Resume r2 = new Resume();
-        r2.setUuid("uuid2");
-        Resume r3 = new Resume();
-        r3.setUuid("uuid3");
+        Resume r1 = new Resume("a","uuid1");
+        Resume r2 = new Resume("b", "uuid2");
+        Resume r3 = new Resume("c", "uuid3");
 
         storage.save(r1);
         storage.save(r2);
@@ -35,8 +32,7 @@ public class MainTestArrayStorage {
 
         System.out.println("Get dummy: " + storage.get("dummy"));
 
-        Resume r4 = new Resume();
-        r4.setUuid("uuid3");
+        Resume r4 = new Resume("d", "uuid3");
         storage.update(r4);
         System.out.println("Size after update: " + storage.size());
 
@@ -50,8 +46,7 @@ public class MainTestArrayStorage {
 
         long timeBefore = System.currentTimeMillis();
         for (int i = 0; i <= 10000; i++) {
-            Resume r = new Resume();
-            r.setUuid(String.valueOf(i));
+            Resume r = new Resume(String.valueOf(i));
             storage.save(r);
         }
         System.out.println(storage.size());
