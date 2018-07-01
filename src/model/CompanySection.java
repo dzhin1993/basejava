@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CompanySection extends Section {
-    private List<Company> companies;
+    private final List<Company> companies;
 
     public CompanySection(List<Company> companies) {
         Objects.requireNonNull(companies, "companies can't be null");
@@ -15,8 +15,17 @@ public class CompanySection extends Section {
         return companies;
     }
 
-    public void setCompanyes(List<Company> companies) {
-        this.companies = companies;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CompanySection that = (CompanySection) o;
+        return Objects.equals(companies, that.companies);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(companies);
     }
 
     @Override
