@@ -7,7 +7,7 @@ public class CompanySection extends Section {
     private final List<Company> companies;
 
     public CompanySection(List<Company> companies) {
-        Objects.requireNonNull(companies, "companies can't be null");
+        Objects.requireNonNull(companies, "companies must not be null");
         this.companies = companies;
     }
 

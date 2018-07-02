@@ -2,10 +2,12 @@ package storage;
 
 import exception.ExistStorageException;
 import exception.NotExistStorageException;
-import model.Resume;
+import model.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,14 +19,47 @@ public abstract class AbstractStorageTest {
 
     protected Storage storage;
 
-    private static final String UUID_1 = "uuid1";
-    private static final String UUID_2 = "uuid2";
-    private static final String UUID_3 = "uuid3";
-    private static final String UUID_4 = "uuid4";
+    private static final String UUID_1 = "uuid_1";
+    private static final String UUID_2 = "uuid_2";
+    private static final String UUID_3 = "uuid_3";
+    private static final String UUID_4 = "uuid_4";
     private static final Resume R1 = new Resume(UUID_1, "Аня");
     private static final Resume R2 = new Resume(UUID_2, "Аня");
     private static final Resume R3 = new Resume(UUID_3, "Петя");
     private static final Resume R4 = new Resume(UUID_4, "Коля");
+
+    static {
+        R1.setContact(ContactType.PHONE, "1");
+        R2.setContact(ContactType.PHONE, "2");
+        R3.setContact(ContactType.PHONE, "3");
+        R4.setContact(ContactType.PHONE, "4");
+        R1.setContact(ContactType.MAIL, "1@mail.ru");
+        R2.setContact(ContactType.MAIL, "2@mail.ru");
+        R3.setContact(ContactType.MAIL, "3@mail.ru");
+        R4.setContact(ContactType.MAIL, "4@mail.ru");
+        R1.setSection(SectionType.PERSONAL, new TextSection("1"));
+        R1.setSection(SectionType.PERSONAL, new TextSection("2"));
+        R1.setSection(SectionType.PERSONAL, new TextSection("3"));
+        R1.setSection(SectionType.PERSONAL, new TextSection("4"));
+        R1.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2")));
+        R2.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3")));
+        R3.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4")));
+        R4.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4", "5")));
+        Company company1 = new Company("company1", null);
+        company1.addPost("developer",
+                LocalDate.now(Clock.systemDefaultZone()),
+                LocalDate.now(Clock.systemDefaultZone()),
+                "good developer");
+        Company company2 = new Company("company2", null);
+        company1.addPost("developer",
+                LocalDate.now(Clock.systemDefaultZone()),
+                LocalDate.now(Clock.systemDefaultZone()),
+                "good developer");
+        R1.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
+        R2.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
+        R3.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
+        R4.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
+    }
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -47,8 +82,9 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void update() {
-        storage.update(R1);
-        assertEquals(R1, storage.get(UUID_1));
+        Resume resume = new Resume(UUID_1, "Никита");
+        storage.update(resume);
+        assertEquals(resume, storage.get(UUID_1));
     }
 
     @Test(expected = NotExistStorageException.class)
