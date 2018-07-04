@@ -10,10 +10,12 @@ public class MainFile {
     private static void findFiles(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for (int i = files.length; --i >= 0; ) {
-                findFiles(files[i]);
+            if (files != null) {
+                for (File currentFile : files) {
+                    findFiles(currentFile);
+                }
             }
-        }else {
+        } else {
             System.out.println(file.getAbsolutePath());
         }
     }
