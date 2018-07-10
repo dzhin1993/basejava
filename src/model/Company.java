@@ -1,20 +1,28 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Company {
-    private final Link link;
-    private final List<Post> postList = new ArrayList<>();
+import static util.DateUtil.NOW;
+import static util.DateUtil.of;
 
-    public Company(String name, String url) {
-        this.link = new Link(name, url);
+public class Company implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final Link link;
+    private List<Post> postList = new ArrayList<>();
+
+    public Company(String name, String url, Post... posts) {
+        this(new Link(name, url), Arrays.asList(posts));
     }
 
-    public void addPost(String position, LocalDate startWork, LocalDate endWork, String description) {
-        this.postList.add(new Post(position, startWork, endWork, description));
+    private Company(Link link, List<Post> postList) {
+        this.link = link;
+        this.postList = postList;
     }
 
     public Link getLink() {
@@ -47,11 +55,19 @@ public class Company {
                 '}';
     }
 
-    private class Post {
+    public static class Post implements Serializable{
         private final String position;
         private final LocalDate startWork;
         private final LocalDate endWork;
         private String description;
+
+        public Post(String position, int startYear, Month startMonth, String description){
+            this(position, of(startYear, startMonth), NOW, description);
+        }
+
+        public Post(String position, int startYear, Month startMonth, int endYear, Month endMonth, String description) {
+            this(position, of(startYear, startMonth), of(endYear, endMonth), description);
+        }
 
         private Post(String position, LocalDate startWork, LocalDate endWork, String description) {
             Objects.requireNonNull(position, "position must not be null");

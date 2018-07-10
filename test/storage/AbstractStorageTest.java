@@ -6,8 +6,8 @@ import model.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.Clock;
-import java.time.LocalDate;
+import java.io.File;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public abstract class AbstractStorageTest {
+    protected static final File STORAGE_DIR = new File("C:\\Users\\User\\Desktop\\basejava\\src\\storage\\storage");
 
     protected Storage storage;
 
@@ -45,16 +46,10 @@ public abstract class AbstractStorageTest {
         R2.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3")));
         R3.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4")));
         R4.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4", "5")));
-        Company company1 = new Company("company1", null);
-        company1.addPost("developer",
-                LocalDate.now(Clock.systemDefaultZone()),
-                LocalDate.now(Clock.systemDefaultZone()),
-                "good developer");
-        Company company2 = new Company("company2", null);
-        company1.addPost("developer",
-                LocalDate.now(Clock.systemDefaultZone()),
-                LocalDate.now(Clock.systemDefaultZone()),
-                "good developer");
+        Company.Post post = new Company.Post("developer", 2016, Month.APRIL, 2017, Month.DECEMBER, "good");
+        Company.Post post2 = new Company.Post("developer2", 2012, Month.MARCH, 2018, Month.DECEMBER, "good");
+        Company company1 = new Company("good company", "company.com", post, post2);
+        Company company2 = new Company("good company", "company.com", post, post2);
         R1.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R2.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R3.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
