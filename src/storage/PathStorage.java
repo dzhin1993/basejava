@@ -2,12 +2,14 @@ package storage;
 
 import exception.StorageException;
 import model.Resume;
+import storage.serialize.SerializeStrategy;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,26 +30,17 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> getResumeList() {
-        List<Path> pathList;
         try {
-            pathList = Files.list(directory).collect(Collectors.toList());
+            return Files.list(directory).map(this::getResume).collect(Collectors.toList());
         } catch (IOException e) {
             throw new StorageException("IO error", null);
         }
-        if (pathList == null) {
-            throw new StorageException("Directory read error", null);
-        }
-        ArrayList<Resume> resumes = new ArrayList<>(pathList.size());
-        for (Path currentPath : pathList) {
-            resumes.add(getResume(currentPath));
-        }
-        return resumes;
     }
 
     @Override
     protected void updateResume(Path path, Resume resume) {
         try {
-            strategy.doWrite(resume, new BufferedOutputStream(new FileOutputStream(path.toFile())));
+            strategy.doWrite(resume, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", resume.getUuid(), e);
         }
@@ -66,7 +59,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected Resume getResume(Path path) {
         try {
-            return strategy.doRead(new BufferedInputStream(new FileInputStream(path.toFile())));
+            return strategy.doRead(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.toString(), e);
         }
@@ -88,7 +81,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected Path getSearchKey(String key) {
-        return Paths.get(directory.toString() + "\\" + key);
+        return directory.resolve(key);
     }
 
     @Override
@@ -103,7 +96,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     public int size() {
         try {
-            return Files.list(directory).collect(Collectors.toList()).size();
+            return (int) Files.list(directory).count();
         } catch (IOException e) {
             throw new StorageException("IO error", null);
         }

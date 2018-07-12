@@ -1,4 +1,4 @@
-package storage;
+package storage.serialize;
 
 import exception.StorageException;
 import model.Resume;
