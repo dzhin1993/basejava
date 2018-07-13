@@ -3,7 +3,10 @@ package model;
 import java.util.Objects;
 
 public class TextSection extends Section {
-    private final String content;
+    private String content;
+
+    public TextSection() {
+    }
 
     public TextSection(String content) {
         Objects.requireNonNull(content, "content must not be null");

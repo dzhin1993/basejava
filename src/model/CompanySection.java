@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class CompanySection extends Section {
-    private final List<Company> companies;
+    private List<Company> companies;
+
+    public CompanySection() {
+    }
 
     public CompanySection(List<Company> companies) {
         Objects.requireNonNull(companies, "companies must not be null");

@@ -1,5 +1,10 @@
 package model;
 
+import util.LocalDateAdapter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Month;
@@ -11,10 +16,14 @@ import java.util.Objects;
 import static util.DateUtil.NOW;
 import static util.DateUtil.of;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final Link link;
+    private Link link;
     private List<Post> postList = new ArrayList<>();
+
+    public Company() {
+    }
 
     public Company(String name, String url, Post... posts) {
         this(new Link(name, url), Arrays.asList(posts));
@@ -55,13 +64,19 @@ public class Company implements Serializable {
                 '}';
     }
 
-    public static class Post implements Serializable{
-        private final String position;
-        private final LocalDate startWork;
-        private final LocalDate endWork;
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Post implements Serializable {
+        private String position;
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate startWork;
+        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        private LocalDate endWork;
         private String description;
 
-        public Post(String position, int startYear, Month startMonth, String description){
+        public Post() {
+        }
+
+        public Post(String position, int startYear, Month startMonth, String description) {
             this(position, of(startYear, startMonth), NOW, description);
         }
 

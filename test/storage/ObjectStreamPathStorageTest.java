@@ -1,9 +1,9 @@
 package storage;
 
-import storage.serialize.ObjectStreamStrategy;
+import storage.serialize.ObjectStreamSerialization;
 
 public class ObjectStreamPathStorageTest extends AbstractStorageTest {
     public ObjectStreamPathStorageTest() {
-        super(new PathStorage(STORAGE_DIR.toString(), new ObjectStreamStrategy()));
+        super(new PathStorage(STORAGE_DIR.toString(), new ObjectStreamSerialization()));
     }
 }
