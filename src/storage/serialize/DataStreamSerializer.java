@@ -31,6 +31,7 @@ public class DataStreamSerializer implements SerializeStrategy {
                 writeSection(dos, sectionType, entry.getValue());
             }
         }
+
     }
 
     @Override
