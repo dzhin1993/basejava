@@ -39,9 +39,9 @@ public abstract class AbstractStorageTest {
         R3.setContact(ContactType.MAIL, "3@mail.ru");
         R4.setContact(ContactType.MAIL, "4@mail.ru");
         R1.setSection(SectionType.PERSONAL, new TextSection("1"));
-        R1.setSection(SectionType.PERSONAL, new TextSection("2"));
-        R1.setSection(SectionType.PERSONAL, new TextSection("3"));
-        R1.setSection(SectionType.PERSONAL, new TextSection("4"));
+        R2.setSection(SectionType.PERSONAL, new TextSection("2"));
+        R3.setSection(SectionType.PERSONAL, new TextSection("3"));
+        R4.setSection(SectionType.PERSONAL, new TextSection("4"));
         R1.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2")));
         R2.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3")));
         R3.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4")));

@@ -22,14 +22,14 @@ public class Company implements Serializable {
     private Link link;
     private List<Post> postList = new ArrayList<>();
 
-    public Company() {
+    public Company(){
     }
 
     public Company(String name, String url, Post... posts) {
         this(new Link(name, url), Arrays.asList(posts));
     }
 
-    private Company(Link link, List<Post> postList) {
+    public Company(Link link, List<Post> postList) {
         this.link = link;
         this.postList = postList;
     }
@@ -40,6 +40,10 @@ public class Company implements Serializable {
 
     public List<Post> getPostList() {
         return postList;
+    }
+
+    public void setPostList(List<Post> postList) {
+        this.postList = postList;
     }
 
     @Override
@@ -73,7 +77,7 @@ public class Company implements Serializable {
         private LocalDate endWork;
         private String description;
 
-        public Post() {
+        public Post(){
         }
 
         public Post(String position, int startYear, Month startMonth, String description) {
@@ -84,7 +88,7 @@ public class Company implements Serializable {
             this(position, of(startYear, startMonth), of(endYear, endMonth), description);
         }
 
-        private Post(String position, LocalDate startWork, LocalDate endWork, String description) {
+        public Post(String position, LocalDate startWork, LocalDate endWork, String description) {
             Objects.requireNonNull(position, "position must not be null");
             Objects.requireNonNull(startWork, "startWork must not be null");
             Objects.requireNonNull(endWork, "endWork must not be null");

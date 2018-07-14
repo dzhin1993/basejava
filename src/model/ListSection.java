@@ -18,6 +18,10 @@ public class ListSection extends Section {
         return contents;
     }
 
+    public void setContents(List<String> contents) {
+        this.contents = contents;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
