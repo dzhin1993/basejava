@@ -31,7 +31,6 @@ public class DataStreamSerializer implements SerializeStrategy {
                 writeSection(dos, sectionType, entry.getValue());
             }
         }
-
     }
 
     @Override
@@ -54,39 +53,35 @@ public class DataStreamSerializer implements SerializeStrategy {
     }
 
     private void writeSection(DataOutputStream dos, SectionType sectionType, Section section) throws IOException {
-        switch (sectionType.ordinal()) {
-            case 0:
-            case 1:
+        switch (sectionType.getTitle()) {
+            case "Личные качества":
+            case "Позиция":
                 textSectionWriter(dos, section);
                 break;
-            case 2:
-            case 3:
+            case "Достижения":
+            case "Квалификация":
                 listSectionWriter(dos, section);
                 break;
-            case 4:
-            case 5:
+            case "Опыт работы":
+            case "Образование":
                 companySectionWriter(dos, section);
                 break;
         }
     }
 
     private Section readSection(DataInputStream dis, SectionType sectionType) throws IOException {
-        Section result = null;
-        switch (sectionType.ordinal()) {
-            case 0:
-            case 1:
-                result = textSectionReader(dis);
-                break;
-            case 2:
-            case 3:
-                result = listSectionReader(dis);
-                break;
-            case 4:
-            case 5:
-                result = companySectionReader(dis);
-                break;
+        switch (sectionType.getTitle()) {
+            case "Личные качества":
+            case "Позиция":
+                return textSectionReader(dis);
+            case "Достижения":
+            case "Квалификация":
+                return listSectionReader(dis);
+            case "Опыт работы":
+            case "Образование":
+                return companySectionReader(dis);
         }
-        return result;
+        return null;
     }
 
     private void textSectionWriter(DataOutputStream dos, Section section) throws IOException {
