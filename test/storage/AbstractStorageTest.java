@@ -46,8 +46,8 @@ public abstract class AbstractStorageTest {
         R2.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3")));
         R3.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4")));
         R4.setSection(SectionType.ACHIEVEMENT, new ListSection(Arrays.asList("1", "2", "3", "4", "5")));
-        Company.Post post = new Company.Post("developer", 2016, Month.APRIL, 2017, Month.DECEMBER, "good");
-        Company.Post post2 = new Company.Post("developer2", 2012, Month.MARCH, 2018, Month.DECEMBER, "good");
+        Company.Post post = new Company.Post("developer", 2016, Month.APRIL, 2017, Month.DECEMBER, null);
+        Company.Post post2 = new Company.Post("developer2", 2012, Month.MARCH, 2018, Month.DECEMBER, null);
         Company company1 = new Company("good company", "company.com", post, post2);
         Company company2 = new Company("good company", "company.com", post, post2);
         R1.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));

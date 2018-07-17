@@ -20,17 +20,17 @@ public class DataStreamSerializer implements SerializeStrategy {
             dos.writeUTF(resume.getFullName());
             Map<ContactType, String> contacts = resume.getContacts();
             dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> entry : contacts.entrySet()) {
+            writeValues(contacts.entrySet(), entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
-            }
+            });
             Map<SectionType, Section> sections = resume.getSections();
             dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
+            writeValues(sections.entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
                 dos.writeUTF(sectionType.name());
                 writeSection(dos, sectionType, entry.getValue());
-            }
+            });
         }
     }
 
@@ -54,41 +54,39 @@ public class DataStreamSerializer implements SerializeStrategy {
     }
 
     private void writeSection(DataOutputStream dos, SectionType sectionType, Section section) throws IOException {
-        Writable<String> writeString = dos::writeUTF;
-        Writable<Integer> writeInt = dos::writeInt;
         switch (sectionType.getTitle()) {
             case "Личные качества":
             case "Позиция":
                 TextSection textSection = (TextSection) section;
-                writeString.write(textSection.getContent());
+                dos.writeUTF(textSection.getContent());
                 break;
             case "Достижения":
             case "Квалификация":
                 ListSection listSection = (ListSection) section;
                 List<String> contents = listSection.getContents();
-                writeInt.write(contents.size());
-                writeCollection(contents, dos::writeUTF);
+                dos.writeInt(contents.size());
+                writeValues(contents, dos::writeUTF);
                 break;
             case "Опыт работы":
             case "Образование":
                 CompanySection companySection = (CompanySection) section;
                 List<Company> companies = companySection.getCompanies();
-                writeInt.write(companies.size());
-                writeCollection(companies, company -> {
+                dos.writeInt(companies.size());
+                writeValues(companies, company -> {
                     Link link = company.getLink();
-                    writeString.write(link.getName());
-                    writeString.write(link.getUrl());
+                    dos.writeUTF(link.getName());
+                    dos.writeUTF(link.getUrl() == null ? "null" : link.getUrl());
                     List<Company.Post> posts = company.getPostList();
-                    writeInt.write(posts.size());
-                    writeCollection(posts, post -> {
-                        writeString.write(post.getPosition());
+                    dos.writeInt(posts.size());
+                    writeValues(posts, post -> {
+                        dos.writeUTF(post.getPosition());
                         LocalDate startWork = post.getStartWork();
-                        writeInt.write(startWork.getYear());
-                        writeInt.write(startWork.getMonth().getValue());
+                        dos.writeInt(startWork.getYear());
+                        dos.writeInt(startWork.getMonth().getValue());
                         LocalDate endWork = post.getEndWork();
-                        writeInt.write(endWork.getYear());
-                        writeInt.write(endWork.getMonth().getValue());
-                        writeString.write(post.getDescription());
+                        dos.writeInt(endWork.getYear());
+                        dos.writeInt(endWork.getMonth().getValue());
+                        dos.writeUTF(post.getDescription() == null ? "null" : post.getDescription());
                     });
                 });
                 break;
@@ -96,29 +94,32 @@ public class DataStreamSerializer implements SerializeStrategy {
     }
 
     private Section readSection(DataInputStream dis, SectionType sectionType) throws IOException {
-        Readable<String> readString = dis::readUTF;
-        Readable<Integer> readInt = dis::readInt;
         switch (sectionType.getTitle()) {
             case "Личные качества":
             case "Позиция":
                 TextSection textSection = new TextSection();
-                textSection.setContent(readString.read());
+                textSection.setContent(dis.readUTF());
                 return textSection;
             case "Достижения":
             case "Квалификация":
                 ListSection listSection = new ListSection();
-                listSection.setContents(readCollection(readInt.read(), readString));
+                listSection.setContents(readValues(dis.readInt(), dis::readUTF));
                 return listSection;
             case "Опыт работы":
             case "Образование":
                 CompanySection companySection = new CompanySection();
-                List<Company> companies = readCollection(readInt.read(), () -> {
-                    Link link = new Link(readString.read(), readString.read());
-                    List<Company.Post> posts = readCollection(readInt.read(), () -> {
-                        String position = readString.read();
-                        LocalDate startWork = DateUtil.of(readInt.read(), Month.of(readInt.read()));
-                        LocalDate endWork = DateUtil.of(readInt.read(), Month.of(readInt.read()));
-                        String description = readString.read();
+                List<Company> companies = readValues(dis.readInt(), () -> {
+                    String name = dis.readUTF();
+                    String url = dis.readUTF();
+                    Link link = url.equals("null") ? new Link(name, null) : new Link(name, url);
+                    List<Company.Post> posts = readValues(dis.readInt(), () -> {
+                        String position = dis.readUTF();
+                        LocalDate startWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
+                        LocalDate endWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
+                        String description = dis.readUTF();
+                        if (description.equals("null")) {
+                            description = null;
+                        }
                         return new Company.Post(position, startWork, endWork, description);
                     });
                     return new Company(link, posts);
@@ -129,21 +130,21 @@ public class DataStreamSerializer implements SerializeStrategy {
         return null;
     }
 
-    public interface Writable<T> {
+    private interface Writable<T> {
         void write(T t) throws IOException;
     }
 
-    public interface Readable<T> {
+    private interface Readable<T> {
         T read() throws IOException;
     }
 
-    private <T> void writeCollection(Collection<T> collection, Writable<T> writable) throws IOException {
+    private <T> void writeValues(Collection<T> collection, Writable<T> writable) throws IOException {
         for (T element : collection) {
             writable.write(element);
         }
     }
 
-    private <T> List<T> readCollection(int size, Readable<T> readable) throws IOException {
+    private <T> List<T> readValues(int size, Readable<T> readable) throws IOException {
         ArrayList<T> result = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             result.add(readable.read());
