@@ -7,6 +7,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -53,110 +54,100 @@ public class DataStreamSerializer implements SerializeStrategy {
     }
 
     private void writeSection(DataOutputStream dos, SectionType sectionType, Section section) throws IOException {
+        Writable<String> writeString = dos::writeUTF;
+        Writable<Integer> writeInt = dos::writeInt;
         switch (sectionType.getTitle()) {
             case "Личные качества":
             case "Позиция":
-                textSectionWriter(dos, section);
+                TextSection textSection = (TextSection) section;
+                writeString.write(textSection.getContent());
                 break;
             case "Достижения":
             case "Квалификация":
-                listSectionWriter(dos, section);
+                ListSection listSection = (ListSection) section;
+                List<String> contents = listSection.getContents();
+                writeInt.write(contents.size());
+                writeCollection(contents, dos::writeUTF);
                 break;
             case "Опыт работы":
             case "Образование":
-                companySectionWriter(dos, section);
+                CompanySection companySection = (CompanySection) section;
+                List<Company> companies = companySection.getCompanies();
+                writeInt.write(companies.size());
+                writeCollection(companies, company -> {
+                    Link link = company.getLink();
+                    writeString.write(link.getName());
+                    writeString.write(link.getUrl());
+                    List<Company.Post> posts = company.getPostList();
+                    writeInt.write(posts.size());
+                    writeCollection(posts, post -> {
+                        writeString.write(post.getPosition());
+                        LocalDate startWork = post.getStartWork();
+                        writeInt.write(startWork.getYear());
+                        writeInt.write(startWork.getMonth().getValue());
+                        LocalDate endWork = post.getEndWork();
+                        writeInt.write(endWork.getYear());
+                        writeInt.write(endWork.getMonth().getValue());
+                        writeString.write(post.getDescription());
+                    });
+                });
                 break;
         }
     }
 
     private Section readSection(DataInputStream dis, SectionType sectionType) throws IOException {
+        Readable<String> readString = dis::readUTF;
+        Readable<Integer> readInt = dis::readInt;
         switch (sectionType.getTitle()) {
             case "Личные качества":
             case "Позиция":
-                return textSectionReader(dis);
+                TextSection textSection = new TextSection();
+                textSection.setContent(readString.read());
+                return textSection;
             case "Достижения":
             case "Квалификация":
-                return listSectionReader(dis);
+                ListSection listSection = new ListSection();
+                listSection.setContents(readCollection(readInt.read(), readString));
+                return listSection;
             case "Опыт работы":
             case "Образование":
-                return companySectionReader(dis);
+                CompanySection companySection = new CompanySection();
+                List<Company> companies = readCollection(readInt.read(), () -> {
+                    Link link = new Link(readString.read(), readString.read());
+                    List<Company.Post> posts = readCollection(readInt.read(), () -> {
+                        String position = readString.read();
+                        LocalDate startWork = DateUtil.of(readInt.read(), Month.of(readInt.read()));
+                        LocalDate endWork = DateUtil.of(readInt.read(), Month.of(readInt.read()));
+                        String description = readString.read();
+                        return new Company.Post(position, startWork, endWork, description);
+                    });
+                    return new Company(link, posts);
+                });
+                companySection.setCompanies(companies);
+                return companySection;
         }
         return null;
     }
 
-    private void textSectionWriter(DataOutputStream dos, Section section) throws IOException {
-        TextSection textSection = (TextSection) section;
-        dos.writeUTF(textSection.getContent());
+    public interface Writable<T> {
+        void write(T t) throws IOException;
     }
 
-    private TextSection textSectionReader(DataInputStream dis) throws IOException {
-        TextSection textSection = new TextSection();
-        textSection.setContent(dis.readUTF());
-        return textSection;
+    public interface Readable<T> {
+        T read() throws IOException;
     }
 
-    private void listSectionWriter(DataOutputStream dos, Section section) throws IOException {
-        ListSection listSection = (ListSection) section;
-        List<String> contents = listSection.getContents();
-        dos.writeInt(contents.size());
-        for (String content : contents) {
-            dos.writeUTF(content);
+    private <T> void writeCollection(Collection<T> collection, Writable<T> writable) throws IOException {
+        for (T element : collection) {
+            writable.write(element);
         }
     }
 
-    private ListSection listSectionReader(DataInputStream dis) throws IOException {
-        ListSection listSection = new ListSection();
-        List<String> contents = new ArrayList<>();
-        int contentsSize = dis.readInt();
-        for (int k = 0; k < contentsSize; k++) {
-            contents.add(dis.readUTF());
+    private <T> List<T> readCollection(int size, Readable<T> readable) throws IOException {
+        ArrayList<T> result = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            result.add(readable.read());
         }
-        listSection.setContents(contents);
-        return listSection;
-    }
-
-    private void companySectionWriter(DataOutputStream dos, Section section) throws IOException {
-        CompanySection companySection = (CompanySection) section;
-        List<Company> companies = companySection.getCompanies();
-        dos.writeInt(companies.size());
-        for (Company company : companies) {
-            Link link = company.getLink();
-            dos.writeUTF(link.getName());
-            dos.writeUTF(link.getUrl());
-            List<Company.Post> posts = company.getPostList();
-            dos.writeInt(posts.size());
-            for (Company.Post post : posts) {
-                dos.writeUTF(post.getPosition());
-                LocalDate startWork = post.getStartWork();
-                dos.writeInt(startWork.getYear());
-                dos.writeInt(startWork.getMonth().getValue());
-                LocalDate endWork = post.getEndWork();
-                dos.writeInt(endWork.getYear());
-                dos.writeInt(endWork.getMonth().getValue());
-                dos.writeUTF(post.getDescription());
-            }
-        }
-    }
-
-    private CompanySection companySectionReader(DataInputStream dis) throws IOException {
-        CompanySection companySection = new CompanySection();
-        List<Company> companies = new ArrayList<>();
-        int companiesSize = dis.readInt();
-        for (int i = 0; i < companiesSize; i++) {
-            Link link = new Link(dis.readUTF(), dis.readUTF());
-            List<Company.Post> posts = new ArrayList<>();
-            int postsSize = dis.readInt();
-            for (int n = 0; n < postsSize; n++) {
-                String position = dis.readUTF();
-                LocalDate startWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
-                LocalDate endWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
-                String description = dis.readUTF();
-                posts.add(new Company.Post(position, startWork, endWork, description));
-            }
-            Company company = new Company(link, posts);
-            companies.add(company);
-        }
-        companySection.setCompanies(companies);
-        return companySection;
+        return result;
     }
 }
