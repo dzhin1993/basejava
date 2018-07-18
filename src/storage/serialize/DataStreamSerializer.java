@@ -19,18 +19,16 @@ public class DataStreamSerializer implements SerializeStrategy {
             dos.writeUTF(resume.getUuid());
             dos.writeUTF(resume.getFullName());
             Map<ContactType, String> contacts = resume.getContacts();
-            dos.writeInt(contacts.size());
-            writeValues(contacts.entrySet(), entry -> {
+            writeValues(dos, contacts.entrySet(), entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
-            });
+            }, contacts.size());
             Map<SectionType, Section> sections = resume.getSections();
-            dos.writeInt(sections.size());
-            writeValues(sections.entrySet(), entry -> {
+            writeValues(dos, sections.entrySet(), entry -> {
                 SectionType sectionType = entry.getKey();
                 dos.writeUTF(sectionType.name());
                 writeSection(dos, sectionType, entry.getValue());
-            });
+            }, sections.size());
         }
     }
 
@@ -64,21 +62,18 @@ public class DataStreamSerializer implements SerializeStrategy {
             case "Квалификация":
                 ListSection listSection = (ListSection) section;
                 List<String> contents = listSection.getContents();
-                dos.writeInt(contents.size());
-                writeValues(contents, dos::writeUTF);
+                writeValues(dos, contents, dos::writeUTF, contents.size());
                 break;
             case "Опыт работы":
             case "Образование":
                 CompanySection companySection = (CompanySection) section;
                 List<Company> companies = companySection.getCompanies();
-                dos.writeInt(companies.size());
-                writeValues(companies, company -> {
+                writeValues(dos, companies, company -> {
                     Link link = company.getLink();
                     dos.writeUTF(link.getName());
                     dos.writeUTF(link.getUrl() == null ? "null" : link.getUrl());
                     List<Company.Post> posts = company.getPostList();
-                    dos.writeInt(posts.size());
-                    writeValues(posts, post -> {
+                    writeValues(dos, posts, post -> {
                         dos.writeUTF(post.getPosition());
                         LocalDate startWork = post.getStartWork();
                         dos.writeInt(startWork.getYear());
@@ -87,8 +82,8 @@ public class DataStreamSerializer implements SerializeStrategy {
                         dos.writeInt(endWork.getYear());
                         dos.writeInt(endWork.getMonth().getValue());
                         dos.writeUTF(post.getDescription() == null ? "null" : post.getDescription());
-                    });
-                });
+                    }, posts.size());
+                }, companies.size());
                 break;
         }
     }
@@ -103,16 +98,16 @@ public class DataStreamSerializer implements SerializeStrategy {
             case "Достижения":
             case "Квалификация":
                 ListSection listSection = new ListSection();
-                listSection.setContents(readValues(dis.readInt(), dis::readUTF));
+                listSection.setContents(readValues(dis, dis::readUTF));
                 return listSection;
             case "Опыт работы":
             case "Образование":
                 CompanySection companySection = new CompanySection();
-                List<Company> companies = readValues(dis.readInt(), () -> {
+                List<Company> companies = readValues(dis, () -> {
                     String name = dis.readUTF();
                     String url = dis.readUTF();
                     Link link = url.equals("null") ? new Link(name, null) : new Link(name, url);
-                    List<Company.Post> posts = readValues(dis.readInt(), () -> {
+                    List<Company.Post> posts = readValues(dis, () -> {
                         String position = dis.readUTF();
                         LocalDate startWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
                         LocalDate endWork = DateUtil.of(dis.readInt(), Month.of(dis.readInt()));
@@ -138,13 +133,15 @@ public class DataStreamSerializer implements SerializeStrategy {
         T read() throws IOException;
     }
 
-    private <T> void writeValues(Collection<T> collection, Writable<T> writable) throws IOException {
+    private <T> void writeValues(DataOutputStream dos, Collection<T> collection, Writable<T> writable, int size) throws IOException {
+        dos.writeInt(size);
         for (T element : collection) {
             writable.write(element);
         }
     }
 
-    private <T> List<T> readValues(int size, Readable<T> readable) throws IOException {
+    private <T> List<T> readValues(DataInputStream dis, Readable<T> readable) throws IOException {
+        int size = dis.readInt();
         ArrayList<T> result = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             result.add(readable.read());
