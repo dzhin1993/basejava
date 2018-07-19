@@ -3,28 +3,22 @@ public class MainDeadLock {
     private static final Object LOCK_2 = new Object();
 
     public static void main(String[] args) {
-        Thread thread1 = new Thread(MainDeadLock::lock_1BeforeLock_2);
-        Thread thread2 = new Thread(MainDeadLock::lock_2BeforeLock_1);
+        Thread thread1 = new Thread(() -> doSomething(LOCK_1, LOCK_2));
+        Thread thread2 = new Thread(() -> doSomething(LOCK_2, LOCK_1));
 
         thread1.start();
         thread2.start();
 
     }
-
-    private static void lock_1BeforeLock_2() {
-        synchronized (LOCK_1) {
-            System.out.println(Thread.currentThread().getName() + " is capture LOCK_1");
-            synchronized (LOCK_2) {
-                System.out.println(Thread.currentThread().getName() + " is capture LOCK_2");
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    private static void doSomething(Object lock1, Object lock2) {
+        synchronized (lock1) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignore) {
             }
-        }
-    }
-
-    private static void lock_2BeforeLock_1() {
-        synchronized (LOCK_2) {
-            System.out.println(Thread.currentThread().getName() + " is capture LOCK_2");
-            synchronized (LOCK_1) {
-                System.out.println(Thread.currentThread().getName() + " is capture LOCK_1");
+            synchronized (lock2) {
+                System.out.println("I can not print this text :(");
             }
         }
     }
