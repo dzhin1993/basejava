@@ -22,7 +22,7 @@ public class Company implements Serializable {
     private Link link;
     private List<Post> postList = new ArrayList<>();
 
-    public Company(){
+    public Company() {
     }
 
     public Company(String name, String url, Post... posts) {
@@ -77,7 +77,7 @@ public class Company implements Serializable {
         private LocalDate endWork;
         private String description;
 
-        public Post(){
+        public Post() {
         }
 
         public Post(String position, int startYear, Month startMonth, String description) {
@@ -95,7 +95,7 @@ public class Company implements Serializable {
             this.position = position;
             this.startWork = startWork;
             this.endWork = endWork;
-            this.description = description;
+            this.description = description == null ? "" : description;
         }
 
         public String getPosition() {
