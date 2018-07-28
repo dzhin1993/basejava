@@ -95,10 +95,12 @@ public class DataStreamSerializer implements SerializeStrategy {
         return null;
     }
 
+    @FunctionalInterface
     private interface Writable<T> {
         void write(T t) throws IOException;
     }
 
+    @FunctionalInterface
     private interface Readable<T> {
         T read() throws IOException;
     }
@@ -126,6 +128,7 @@ public class DataStreamSerializer implements SerializeStrategy {
         }
     }
 
+    @FunctionalInterface
     private interface ElementProcessor {
         void process() throws IOException;
     }

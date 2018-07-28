@@ -39,20 +39,20 @@ public class Resume implements Serializable {
         return uuid;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public Map<ContactType, String> getContacts() {
         return contacts;
     }
 
     public Map<SectionType, Section> getSections() {
         return sections;
-    }
-
-    public String getContact(ContactType contactType){
-       return contacts.get(contactType);
-    }
-
-    public Section getSection(SectionType sectionType){
-        return sections.get(sectionType);
     }
 
     public void setContact(ContactType contactType, String contact){

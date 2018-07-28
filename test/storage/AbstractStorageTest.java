@@ -2,12 +2,12 @@ package storage;
 
 import exception.ExistStorageException;
 import exception.NotExistStorageException;
-import model.*;
+import model.Resume;
 import org.junit.Before;
 import org.junit.Test;
+import util.Config;
 
 import java.io.File;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public abstract class AbstractStorageTest {
-    protected static final File STORAGE_DIR = new File("C:\\Users\\User\\Desktop\\basejava\\src\\storage\\storage");
+    protected static final File STORAGE_DIR = Config.getInstance().getStorageDir();
 
     protected Storage storage;
 
@@ -30,7 +30,7 @@ public abstract class AbstractStorageTest {
     private static final Resume R4 = new Resume(UUID_4, "Коля");
 
     static {
-        R1.setContact(ContactType.PHONE, "1");
+       /* R1.setContact(ContactType.PHONE, "1");
         R2.setContact(ContactType.PHONE, "2");
         R3.setContact(ContactType.PHONE, "3");
         R4.setContact(ContactType.PHONE, "4");
@@ -53,7 +53,7 @@ public abstract class AbstractStorageTest {
         R1.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R2.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R3.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
-        R4.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
+        R4.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));*/
     }
 
     protected AbstractStorageTest(Storage storage) {
