@@ -1,8 +1,7 @@
-package util;
+package sql;
 
 import exception.ExistStorageException;
 import exception.StorageException;
-import sql.ConnectionFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

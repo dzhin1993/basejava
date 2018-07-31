@@ -11,8 +11,8 @@ import java.util.Properties;
 public class Config {
     private static final Config INSTANCE = new Config();
     private final File PROPS = new File("config/resumes.properties");
-    private Properties props = new Properties();
-    private File storageDir;
+    private final Properties props = new Properties();
+    private final File storageDir;
 
     private final SqlStorage sqlStorage;
 

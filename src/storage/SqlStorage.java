@@ -2,7 +2,7 @@ package storage;
 
 import exception.NotExistStorageException;
 import model.Resume;
-import util.SqlHelper;
+import sql.SqlHelper;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
