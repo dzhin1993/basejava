@@ -2,7 +2,6 @@ package storage;
 
 import exception.NotExistStorageException;
 import model.Resume;
-import sql.ConnectionFactory;
 import util.SqlHelper;
 
 import java.sql.DriverManager;
@@ -14,8 +13,7 @@ import java.util.List;
 public class SqlStorage implements Storage {
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
-        ConnectionFactory connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-        SqlHelper.setConnectionFactory(connectionFactory);
+        SqlHelper.setConnectionFactory(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
     @Override
@@ -85,8 +83,7 @@ public class SqlStorage implements Storage {
     public int size() {
         return SqlHelper.connectionExecutor("SELECT COUNT(*) FROM resume", ps -> {
             ResultSet rs = ps.executeQuery();
-            rs.next();
-            return rs.getInt(1);
+            return rs.next() ? rs.getInt(1) : 0;
         });
     }
 }
