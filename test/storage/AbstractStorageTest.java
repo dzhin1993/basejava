@@ -2,14 +2,13 @@ package storage;
 
 import exception.ExistStorageException;
 import exception.NotExistStorageException;
-import model.Resume;
+import model.*;
 import org.junit.Before;
 import org.junit.Test;
 import util.Config;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
@@ -20,17 +19,17 @@ public abstract class AbstractStorageTest {
 
     protected Storage storage;
 
-    private static final String UUID_1 = "uuid_1";
-    private static final String UUID_2 = "uuid_2";
-    private static final String UUID_3 = "uuid_3";
-    private static final String UUID_4 = "uuid_4";
+    private static final String UUID_1 = UUID.randomUUID().toString();
+    private static final String UUID_2 = UUID.randomUUID().toString();
+    private static final String UUID_3 = UUID.randomUUID().toString();
+    private static final String UUID_4 = UUID.randomUUID().toString();
     private static final Resume R1 = new Resume(UUID_1, "Аня");
     private static final Resume R2 = new Resume(UUID_2, "Аня");
     private static final Resume R3 = new Resume(UUID_3, "Петя");
     private static final Resume R4 = new Resume(UUID_4, "Коля");
 
     static {
-       /* R1.setContact(ContactType.PHONE, "1");
+        R1.setContact(ContactType.PHONE, "1");
         R2.setContact(ContactType.PHONE, "2");
         R3.setContact(ContactType.PHONE, "3");
         R4.setContact(ContactType.PHONE, "4");
@@ -38,7 +37,7 @@ public abstract class AbstractStorageTest {
         R2.setContact(ContactType.MAIL, "2@mail.ru");
         R3.setContact(ContactType.MAIL, "3@mail.ru");
         R4.setContact(ContactType.MAIL, "4@mail.ru");
-        R1.setSection(SectionType.PERSONAL, new TextSection("1"));
+       /* R1.setSection(SectionType.PERSONAL, new TextSection("1"));
         R2.setSection(SectionType.PERSONAL, new TextSection("2"));
         R3.setSection(SectionType.PERSONAL, new TextSection("3"));
         R4.setSection(SectionType.PERSONAL, new TextSection("4"));
@@ -127,6 +126,7 @@ public abstract class AbstractStorageTest {
     @Test
     public void getAll() {
         List<Resume> actual = Arrays.asList(R1, R2, R3);
+        actual.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
         assertThat(actual, is(storage.getAllSorted()));
     }
 }
