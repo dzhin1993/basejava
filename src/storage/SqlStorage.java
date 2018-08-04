@@ -51,7 +51,7 @@ public class SqlStorage implements Storage {
                         }
                     }
                     deleteContacts(conn, r.getUuid());
-                    insertContacts(conn, r, "UPDATE contact SET type = ?, value = ? WHERE resume_uuid = ?");
+                    insertContacts(conn, r);
                     return null;
                 }
         );
@@ -65,7 +65,7 @@ public class SqlStorage implements Storage {
                         ps.setString(2, r.getFullName());
                         ps.execute();
                     }
-                    insertContacts(conn, r, "INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)");
+                    insertContacts(conn, r);
                     return null;
                 }
         );
@@ -73,17 +73,13 @@ public class SqlStorage implements Storage {
 
     @Override
     public void delete(String uuid) {
-        SqlHelper.transactionalExecute(conn -> {
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM resume r WHERE r.uuid=?")) {
-                        ps.setString(1, uuid);
-                        if (ps.executeUpdate() == 0) {
-                            throw new NotExistStorageException(uuid);
-                        }
-                    }
-                    deleteContacts(conn, uuid);
-                    return null;
-                }
-        );
+        SqlHelper.connectionExecutor("DELETE FROM resume r WHERE r.uuid=?", ps -> {
+            ps.setString(1, uuid);
+            if (ps.executeUpdate() == 0) {
+                throw new NotExistStorageException(uuid);
+            }
+            return null;
+        });
     }
 
     @Override
@@ -93,7 +89,7 @@ public class SqlStorage implements Storage {
                 "LEFT JOIN contact c " +
                 "ON r.uuid = c.resume_uuid " +
                 "ORDER BY full_name, uuid", ps -> {
-            LinkedHashMap<String, Resume> resumeHashMap = new LinkedHashMap<>();
+            Map<String, Resume> resumeHashMap = new LinkedHashMap<>();
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String uuid = rs.getString("uuid");
@@ -101,10 +97,9 @@ public class SqlStorage implements Storage {
                     Resume resume = new Resume(uuid, rs.getString("full_name"));
                     resumeHashMap.put(uuid, resume);
                     addContacts(rs, resume);
-                } else {
-                    Resume resume = resumeHashMap.get(uuid);
-                    addContacts(rs, resume);
                 }
+                Resume resume = resumeHashMap.get(uuid);
+                addContacts(rs, resume);
             }
             return new ArrayList<>(resumeHashMap.values());
         });
@@ -118,8 +113,8 @@ public class SqlStorage implements Storage {
         });
     }
 
-    private void insertContacts(Connection conn, Resume r, String query) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
+    private void insertContacts(Connection conn, Resume r) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)")) {
             for (Map.Entry<ContactType, String> e : r.getContacts().entrySet()) {
                 ps.setString(1, r.getUuid());
                 ps.setString(2, e.getKey().name());
