@@ -6,9 +6,7 @@ import model.Resume;
 import sql.SqlHelper;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SqlStorage implements Storage {
 
@@ -19,7 +17,6 @@ public class SqlStorage implements Storage {
     @Override
     public void clear() {
         SqlHelper.connectionExecutor("DELETE FROM resume", PreparedStatement::execute);
-        SqlHelper.connectionExecutor("DELETE FROM contact", PreparedStatement::execute);
     }
 
     @Override
@@ -36,7 +33,7 @@ public class SqlStorage implements Storage {
             }
             Resume r = new Resume(uuid, rs.getString("full_name"));
             do {
-               addContacts(rs, r);
+                addContacts(rs, r);
             } while (rs.next());
 
             return r;
@@ -54,7 +51,7 @@ public class SqlStorage implements Storage {
                         }
                     }
                     deleteContacts(conn, r.getUuid());
-                    insertContacts(conn.prepareStatement("UPDATE contact SET type = ?, value = ? WHERE resume_uuid = ?"), r);
+                    insertContacts(conn, r, "UPDATE contact SET type = ?, value = ? WHERE resume_uuid = ?");
                     return null;
                 }
         );
@@ -68,7 +65,7 @@ public class SqlStorage implements Storage {
                         ps.setString(2, r.getFullName());
                         ps.execute();
                     }
-                    insertContacts(conn.prepareStatement("INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)"), r);
+                    insertContacts(conn, r, "INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)");
                     return null;
                 }
         );
@@ -92,25 +89,28 @@ public class SqlStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         return SqlHelper.transactionalExecute(conn -> {
-                    List<Resume> resumeList = new ArrayList<>();
-                    try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid")) {
+                    HashMap<String, Resume> resumeHashMap = new HashMap<>();
+                    try (PreparedStatement ps = conn.prepareStatement("" +
+                            "SELECT * FROM resume r " +
+                            "LEFT JOIN contact c " +
+                            "ON r.uuid = c.resume_uuid " +
+                            "ORDER BY full_name, uuid")) {
                         ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
-                            Resume resume = new Resume();
                             String uuid = rs.getString("uuid");
-                            resume.setUuid(uuid.trim());
-                            resume.setFullName(rs.getString("full_name"));
-                            try (PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM contact c WHERE c.resume_uuid=?")) {
-                                ps2.setString(1, uuid);
-                                ResultSet rs2 = ps2.executeQuery();
-                                while (rs2.next()) {
-                                    addContacts(rs2, resume);
-                                }
+                            if (resumeHashMap.get(uuid) == null) {
+                                Resume resume = new Resume(uuid, rs.getString("full_name"));
+                                resumeHashMap.put(uuid, resume);
+                                addContacts(rs, resume);
+                            } else {
+                                Resume resume = resumeHashMap.get(uuid);
+                                addContacts(rs, resume);
                             }
-                            resumeList.add(resume);
                         }
                     }
-                    return resumeList;
+                    ArrayList<Resume> list = new ArrayList<>(resumeHashMap.values());
+                    list.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
+                    return list;
                 }
         );
     }
@@ -123,14 +123,16 @@ public class SqlStorage implements Storage {
         });
     }
 
-    private void insertContacts(PreparedStatement ps, Resume r) throws SQLException {
-        for (Map.Entry<ContactType, String> e : r.getContacts().entrySet()) {
-            ps.setString(1, r.getUuid());
-            ps.setString(2, e.getKey().name());
-            ps.setString(3, e.getValue());
-            ps.addBatch();
+    private void insertContacts(Connection conn, Resume r, String query) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            for (Map.Entry<ContactType, String> e : r.getContacts().entrySet()) {
+                ps.setString(1, r.getUuid());
+                ps.setString(2, e.getKey().name());
+                ps.setString(3, e.getValue());
+                ps.addBatch();
+            }
+            ps.executeBatch();
         }
-        ps.executeBatch();
     }
 
     private void deleteContacts(Connection conn, String uuid) throws SQLException {
@@ -140,7 +142,7 @@ public class SqlStorage implements Storage {
         }
     }
 
-    private void addContacts(ResultSet rs, Resume r) throws SQLException{
+    private void addContacts(ResultSet rs, Resume r) throws SQLException {
         String type = rs.getString("type");
         String value = rs.getString("value");
         if (value != null) {
