@@ -88,12 +88,12 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Resume> getAllSorted() {
-        return SqlHelper.connectionExecutor(""  +
+        return SqlHelper.connectionExecutor("" +
                 "SELECT * FROM resume r " +
                 "LEFT JOIN contact c " +
                 "ON r.uuid = c.resume_uuid " +
                 "ORDER BY full_name, uuid", ps -> {
-            HashMap<String, Resume> resumeHashMap = new HashMap<>();
+            LinkedHashMap<String, Resume> resumeHashMap = new LinkedHashMap<>();
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String uuid = rs.getString("uuid");
@@ -106,9 +106,7 @@ public class SqlStorage implements Storage {
                     addContacts(rs, resume);
                 }
             }
-            ArrayList<Resume> list = new ArrayList<>(resumeHashMap.values());
-            list.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
-            return list;
+            return new ArrayList<>(resumeHashMap.values());
         });
     }
 
