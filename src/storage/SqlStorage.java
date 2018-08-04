@@ -88,31 +88,28 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Resume> getAllSorted() {
-        return SqlHelper.transactionalExecute(conn -> {
-                    HashMap<String, Resume> resumeHashMap = new HashMap<>();
-                    try (PreparedStatement ps = conn.prepareStatement("" +
-                            "SELECT * FROM resume r " +
-                            "LEFT JOIN contact c " +
-                            "ON r.uuid = c.resume_uuid " +
-                            "ORDER BY full_name, uuid")) {
-                        ResultSet rs = ps.executeQuery();
-                        while (rs.next()) {
-                            String uuid = rs.getString("uuid");
-                            if (resumeHashMap.get(uuid) == null) {
-                                Resume resume = new Resume(uuid, rs.getString("full_name"));
-                                resumeHashMap.put(uuid, resume);
-                                addContacts(rs, resume);
-                            } else {
-                                Resume resume = resumeHashMap.get(uuid);
-                                addContacts(rs, resume);
-                            }
-                        }
-                    }
-                    ArrayList<Resume> list = new ArrayList<>(resumeHashMap.values());
-                    list.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
-                    return list;
+        return SqlHelper.connectionExecutor("" +
+                "SELECT * FROM resume r " +
+                "LEFT JOIN contact c " +
+                "ON r.uuid = c.resume_uuid " +
+                "ORDER BY full_name, uuid", ps -> {
+            HashMap<String, Resume> resumeHashMap = new HashMap<>();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String uuid = rs.getString("uuid");
+                if (resumeHashMap.get(uuid) == null) {
+                    Resume resume = new Resume(uuid, rs.getString("full_name"));
+                    resumeHashMap.put(uuid, resume);
+                    addContacts(rs, resume);
+                } else {
+                    Resume resume = resumeHashMap.get(uuid);
+                    addContacts(rs, resume);
                 }
-        );
+            }
+            ArrayList<Resume> list = new ArrayList<>(resumeHashMap.values());
+            list.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
+            return list;
+        });
     }
 
     @Override
