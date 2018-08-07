@@ -2,7 +2,7 @@ import java.io.File;
 
 public class MainFile {
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\User\\Desktop\\basejava\\src");
+        File file = new File("C:\\Users\\User\\Desktop\\basejavaProject\\basejava\\src");
         findFiles(file, "");
     }
 
