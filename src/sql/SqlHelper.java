@@ -47,7 +47,7 @@ public class SqlHelper {
     private static StorageException convertException(SQLException e, String uuid) {
         if (e instanceof PSQLException) {
             if (e.getSQLState().equals("23505")) {
-                return new ExistStorageException(null);
+                return new ExistStorageException(uuid);
             }
         }
         return new StorageException(e);
