@@ -1,6 +1,7 @@
 package storage;
 
 import exception.NotExistStorageException;
+import exception.StorageException;
 import model.*;
 import sql.SqlHelper;
 
@@ -10,6 +11,11 @@ import java.util.*;
 public class SqlStorage implements Storage {
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new StorageException("PostgreSQL DataSource unable to load PostgreSQL JDBC Driver");
+        }
         SqlHelper.setConnectionFactory(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
