@@ -11,10 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
-    private static SqlStorage sqlStorage = Config.getInstance().getSqlStorage();
+    private static SqlStorage sqlStorage;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -33,7 +34,8 @@ public class ResumeServlet extends HttpServlet {
         response.setContentType("text/html; charset=UTF-8");
         /*String name = request.getParameter("name");
         response.getWriter().write(name == null ? "Hello Resumes!" : "Hello " + name + '!');*/
-        response.getWriter().write("<!DOCTYPE html>\n" +
+        PrintWriter writer = response.getWriter();
+        writer.write("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
@@ -44,7 +46,7 @@ public class ResumeServlet extends HttpServlet {
                 "<table border=\"1\">\n");
         List<Resume> resumes = sqlStorage.getAllSorted();
         for (Resume resume : resumes) {
-            response.getWriter().write("<tr>\n" +
+            writer.write("<tr>\n" +
                     "<td>" + "<header>" + resume.getUuid() + "</header>" + "</td>\n" +
                     "<td>" + "<header>" + resume.getFullName() + "</header>" + "</td>\n" +
                     "<td>" + "<header>" + resume.getContact(ContactType.MAIL) + "</header>" + "</td>\n" +
@@ -57,7 +59,7 @@ public class ResumeServlet extends HttpServlet {
                     "</tr>\n"
             );
         }
-        response.getWriter().write("</table>" +
+        writer.write("</table>" +
                 "</body>" +
                 "</html>");
     }

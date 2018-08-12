@@ -203,13 +203,7 @@ public class SqlStorage implements Storage {
             case ACHIEVEMENT:
             case QUALIFICATIONS:
                 List<String> contents = ((ListSection) section).getContents();
-                StringBuilder result = new StringBuilder();
-                for (String content : contents) {
-                    result.append(content);
-                    result.append("\n");
-                }
-                result.deleteCharAt(result.length() - 1);
-                return result.toString();
+                return String.join("\n", contents);
         }
         return null;
     }
