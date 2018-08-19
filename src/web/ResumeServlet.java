@@ -1,7 +1,6 @@
 package web;
 
-import model.ContactType;
-import model.Resume;
+import model.*;
 import storage.SqlStorage;
 import util.Config;
 
@@ -11,8 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
     private static SqlStorage sqlStorage;
@@ -24,43 +21,59 @@ public class ResumeServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.setCharacterEncoding("UTF-8");
+        String uuid = request.getParameter("uuid");
+        String fullName = request.getParameter("fullName");
+        Resume r = sqlStorage.get(uuid);
+        r.setFullName(fullName);
+        for (ContactType type : ContactType.values()) {
+            String value = request.getParameter(type.name());
+            if (value != null && value.trim().length() != 0) {
+                r.setContact(type, value);
+            } else {
+                r.getContacts().remove(type);
+            }
+        }
+        sqlStorage.update(r);
+        response.sendRedirect("resume");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-//        response.setHeader("Content-Type", "text/html; charset=UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        /*String name = request.getParameter("name");
-        response.getWriter().write(name == null ? "Hello Resumes!" : "Hello " + name + '!');*/
-        PrintWriter writer = response.getWriter();
-        writer.write("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "<link rel=\"stylesheet\" href=\"css/style.css\">\n" +
-                "    <title>Отображение резюме</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<table border=\"1\">\n");
-        List<Resume> resumes = sqlStorage.getAllSorted();
-        for (Resume resume : resumes) {
-            writer.write("<tr>\n" +
-                    "<td>" + "<header>" + resume.getUuid() + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getFullName() + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.MAIL) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.PHONE) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.SKYPE) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.HOMEPAGE) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.GITHUB) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.STACKOVERFLOW) + "</header>" + "</td>\n" +
-                    "<td>" + "<header>" + resume.getContact(ContactType.LINKED_IN) + "</header>" + "</td>\n" +
-                    "</tr>\n"
-            );
+        String uuid = request.getParameter("uuid");
+        String action = request.getParameter("action");
+        if (action == null) {
+            request.setAttribute("resumes", sqlStorage.getAllSorted());
+            request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
+            return;
         }
-        writer.write("</table>" +
-                "</body>" +
-                "</html>");
+        Resume r;
+        switch (action) {
+            case "delete":
+                sqlStorage.delete(uuid);
+                response.sendRedirect("resume");
+                return;
+            case "view":
+            case "edit":
+                r = sqlStorage.get(uuid);
+                for (SectionType sectionType : SectionType.values()) {
+                    Section section = r.getSection(sectionType);
+                    if (section == null) {
+                        if (sectionType == SectionType.PERSONAL || sectionType == SectionType.OBJECTIVE) {
+                            r.setSection(sectionType, TextSection.TEXT_EMPTY);
+                        } else if (sectionType == SectionType.ACHIEVEMENT || sectionType == SectionType.QUALIFICATIONS) {
+                           r.setSection(sectionType, ListSection.LIST_EMPTY);
+                        } else {
+                            r.setSection(sectionType, CompanySection.COMPANY_EMPTY);
+                        }
+                    }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Action " + action + " is illegal");
+        }
+        request.setAttribute("resume", r);
+        request.getRequestDispatcher(
+                ("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
+        ).forward(request, response);
     }
 }

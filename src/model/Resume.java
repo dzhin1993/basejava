@@ -59,6 +59,10 @@ public class Resume implements Serializable {
         return contacts.get(contactType);
     }
 
+    public Section getSection(SectionType sectionType) {
+        return sections.get(sectionType);
+    }
+
     public void setContact(ContactType contactType, String contact) {
         this.contacts.put(contactType, contact);
     }

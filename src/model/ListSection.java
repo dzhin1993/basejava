@@ -1,10 +1,12 @@
 package model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class ListSection extends Section {
     private List<String> contents;
+    public static final  ListSection LIST_EMPTY = new ListSection(Collections.emptyList());
 
     public ListSection() {
     }

@@ -36,7 +36,7 @@ public class TestData {
         Company.Post post = new Company.Post("developer", 2016, Month.APRIL, 2017, Month.DECEMBER, null);
         Company.Post post2 = new Company.Post("developer2", 2012, Month.MARCH, 2018, Month.DECEMBER, null);
         Company company1 = new Company("good company", "company.com", post, post2);
-        Company company2 = new Company("good company", "company.com", post, post2);
+        Company company2 = new Company("good company2", "company2.com", post, post2);
         R1.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R2.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
         R3.setSection(SectionType.EXPERIENCE, new CompanySection(Arrays.asList(company1, company2)));
