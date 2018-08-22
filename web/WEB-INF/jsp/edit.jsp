@@ -42,7 +42,7 @@
                 <c:when test="${type=='ACHIEVEMENT'|| type=='QUALIFICATIONS'}">
                     <dl>
                         <dt>${type.title}</dt>
-                        <dd><textarea rows="3" cols="30"><%=String.join("\n", ((ListSection)section).getContents())%></textarea></dd>
+                        <dd><textarea rows="3" cols="30" name="${type.name()}"><%=String.join("\n", ((ListSection)section).getContents())%></textarea></dd>
                     </dl>
                 </c:when>
                 <c:when test="${type=='EXPERIENCE'|| type=='EDUCATION'}">
@@ -51,29 +51,30 @@
                         <c:forEach var="company" items="<%=((CompanySection)section).getCompanies()%>">
                             <dl>
                                 <dt>Компания</dt>
-                                <dd><input type="text" name="company" size=30 value="${company.link.name}"></dd>
+                                <dd><input type="text" name="${type}companyName" size=30 value="${company.link.name}"></dd>
                             </dl>
                             <dl>
                                 <dt>Ссылка url</dt>
-                                <dd><input type="text" name="url" size=30 value="${company.link.url}"></dd>
+                                <dd><input type="text" name="${type}url" size=30 value="${company.link.url}"></dd>
                             </dl>
+                            <c:set var="companyID" value="${type}${company.link.name}"/>
                             <h4>Список должностей:</h4>
                             <c:forEach var="post" items="${company.postList}">
                                 <dl>
                                     <dt>Должность</dt>
-                                    <dd><input type="text" name="position" size=30 value="${post.position}"></dd>
+                                    <dd><input type="text" name="${companyID}position" size=30 value="${post.position}"></dd>
                                 </dl>
                                 <dl>
                                     <dt>Описание</dt>
-                                    <dd><input type="text" name="description" size=30 value="${post.description}"></dd>
+                                    <dd><input type="text" name="${companyID}description" size=30 value="${post.description}"></dd>
                                 </dl>
                                 <dl>
                                     <dt>Начало работы</dt>
-                                    <dd><input type="text" name="startWork" size=30 value="${post.startWork}"></dd>
+                                    <dd><input type="text" name="${companyID}startWork" size=30 value="${post.startWork}"></dd>
                                 </dl>
                                 <dl>
                                     <dt>Конец работы</dt>
-                                    <dd><input type="text" name="endWork" size=30 value="${post.endWork}"></dd>
+                                    <dd><input type="text" name="${companyID}endWork" size=30 value="${post.endWork}"></dd>
                                 </dl>
                                 <br/>
                             </c:forEach>

@@ -9,8 +9,8 @@ public class CompanySection extends Section {
     public static final CompanySection COMPANY_EMPTY = new CompanySection();
 
     static {
-        Company.Post posts = new Company.Post();
-        Company company = new Company(new Link("", ""), Collections.singletonList(posts));
+        Company.Post post = new Company.Post();
+        Company company = new Company(new Link("", ""), Collections.singletonList(post));
         COMPANY_EMPTY.setCompanies(Collections.singletonList(company));
     }
 

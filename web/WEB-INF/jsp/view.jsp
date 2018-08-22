@@ -28,19 +28,27 @@
             <c:choose>
                 <c:when test="<%=(sectionType == SectionType.PERSONAL)||(sectionType == SectionType.OBJECTIVE)%>">
                     <%TextSection textSection = (TextSection) sectionEntry.getValue();%>
-                    <tr>
-                        <th><h3>${sectionName}</h3></th>
-                        <th><%=textSection.getContent()%>
-                        </th>
-                    </tr>
+                    <c:choose>
+                        <c:when test="<%=textSection != TextSection.TEXT_EMPTY%>">
+                            <tr>
+                                <th><h3>${sectionName}</h3></th>
+                                <th><%=textSection.getContent()%>
+                                </th>
+                            </tr>
+                        </c:when>
+                    </c:choose>
                 </c:when>
                 <c:when test="<%=(sectionType == SectionType.ACHIEVEMENT)||(sectionType == SectionType.QUALIFICATIONS)%>">
                     <%ListSection listSection = (ListSection) sectionEntry.getValue();%>
-                    <tr>
-                        <th><h3>${sectionName}</h3></th>
-                        <th><%=String.join("<br/>", listSection.getContents())%>
-                        </th>
-                    </tr>
+                    <c:choose>
+                        <c:when test="<%=listSection != ListSection.LIST_EMPTY%>">
+                            <tr>
+                                <th><h3>${sectionName}</h3></th>
+                                <th><%=String.join("<br/>", listSection.getContents())%>
+                                </th>
+                            </tr>
+                        </c:when>
+                    </c:choose>
                 </c:when>
                 <c:when test="<%=(sectionType == SectionType.EDUCATION)||(sectionType == SectionType.EXPERIENCE)%>">
                     <%CompanySection companySection = (CompanySection) sectionEntry.getValue();%>
@@ -50,7 +58,8 @@
                             <th><h3>${sectionName}</h3></th>
                             <c:forEach var="company" items="<%=companySection.getCompanies()%>">
                                 <tr>
-                                <th><h4><a href="${company.link.name}">${company.link.name}</a></h4></th>
+                                <th><h4>Компания: </h4></th>
+                                <h4><a href="${company.link.name}"> ${company.link.name}</a></h4>
                                 <c:forEach var="post" items="${company.postList}">
                                     <tr>
                                         <th> Должность: ${post.position}</th>

@@ -90,8 +90,6 @@ public class Company implements Serializable {
 
         public Post(String position, LocalDate startWork, LocalDate endWork, String description) {
             Objects.requireNonNull(position, "position must not be null");
-            Objects.requireNonNull(startWork, "startWork must not be null");
-            Objects.requireNonNull(endWork, "endWork must not be null");
             this.position = position;
             this.startWork = startWork;
             this.endWork = endWork;
