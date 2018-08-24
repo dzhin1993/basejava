@@ -19,7 +19,6 @@
             <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>
         </c:forEach>
     </p>
-    <p>
         <c:forEach var="sectionEntry" items="${resume.sections}">
             <jsp:useBean id="sectionEntry"
                          type="java.util.Map.Entry<model.SectionType, model.Section>"/>
@@ -44,8 +43,7 @@
                         <c:when test="<%=listSection != ListSection.LIST_EMPTY%>">
                             <tr>
                                 <th><h3>${sectionName}</h3></th>
-                                <th><%=String.join("<br/>", listSection.getContents())%>
-                                </th>
+                                <th><%=String.join("<br/>", listSection.getContents())%></th>
                             </tr>
                         </c:when>
                     </c:choose>
@@ -58,19 +56,20 @@
                             <th><h3>${sectionName}</h3></th>
                             <c:forEach var="company" items="<%=companySection.getCompanies()%>">
                                 <tr>
-                                <th><h4>Компания: </h4></th>
-                                <h4><a href="${company.link.name}"> ${company.link.name}</a></h4>
+                                <td><h4>Компания: <a href="${company.link.name}"> ${company.link.name}</a></h4></td>
+                                </tr>
+                                <h4> Список должностей </h4>
                                 <c:forEach var="post" items="${company.postList}">
                                     <tr>
-                                        <th> Должность: ${post.position}</th>
+                                        <th><b>Должность: ${post.position}</b></th>
                                         <br/>
                                         <th> Описание: ${post.description}</th>
                                         <br/>
                                         <th> Продолжительность работы: ${post.startWork} - ${post.startWork}</th>
                                         <br/>
+                                        <br/>
                                     </tr>
                                 </c:forEach>
-                                </tr>
                             </c:forEach>
                         </c:when>
                     </c:choose>

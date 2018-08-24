@@ -43,11 +43,15 @@ public class ResumeServlet extends HttpServlet {
             switch (type) {
                 case PERSONAL:
                 case OBJECTIVE:
-                    r.setSection(type, new TextSection(value));
+                    if(!value.isEmpty()){
+                        r.setSection(type, new TextSection(value));
+                    }
                     break;
                 case ACHIEVEMENT:
                 case QUALIFICATIONS:
-                    r.setSection(type, new ListSection(Arrays.asList(value.split("\n"))));
+                    if(!value.isEmpty()){
+                        r.setSection(type, new ListSection(Arrays.asList(value.split("\n"))));
+                    }
                     break;
                 case EXPERIENCE:
                 case EDUCATION:
@@ -109,12 +113,19 @@ public class ResumeServlet extends HttpServlet {
                 for (SectionType sectionType : SectionType.values()) {
                     Section section = r.getSection(sectionType);
                     if (section == null) {
-                        if (sectionType == SectionType.PERSONAL || sectionType == SectionType.OBJECTIVE) {
-                            r.setSection(sectionType, TextSection.TEXT_EMPTY);
-                        } else if (sectionType == SectionType.ACHIEVEMENT || sectionType == SectionType.QUALIFICATIONS) {
-                            r.setSection(sectionType, ListSection.LIST_EMPTY);
-                        } else {
-                            r.setSection(sectionType, CompanySection.COMPANY_EMPTY);
+                        switch (sectionType){
+                            case PERSONAL:
+                            case OBJECTIVE:
+                                r.setSection(sectionType, TextSection.TEXT_EMPTY);
+                                break;
+                            case ACHIEVEMENT:
+                            case QUALIFICATIONS:
+                                r.setSection(sectionType, ListSection.LIST_EMPTY);
+                                break;
+                            case EXPERIENCE:
+                            case EDUCATION:
+                                r.setSection(sectionType, CompanySection.COMPANY_EMPTY);
+                                break;
                         }
                     }
                 }
