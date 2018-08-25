@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class ListSection extends Section {
     private List<String> contents;
-    public static final  ListSection LIST_EMPTY = new ListSection(Collections.emptyList());
 
     public ListSection() {
     }

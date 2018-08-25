@@ -1,18 +1,10 @@
 package model;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class CompanySection extends Section {
     private List<Company> companies;
-    public static final CompanySection COMPANY_EMPTY = new CompanySection();
-
-    static {
-        Company.Post post = new Company.Post();
-        Company company = new Company(new Link("", ""), Collections.singletonList(post));
-        COMPANY_EMPTY.setCompanies(Collections.singletonList(company));
-    }
 
     public CompanySection() {
     }

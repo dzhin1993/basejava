@@ -22,6 +22,8 @@ public class Company implements Serializable {
     private Link link;
     private List<Post> postList = new ArrayList<>();
 
+    public static final Company EMPTY = new Company("", "", Post.EMPTY);
+
     public Company() {
     }
 
@@ -76,6 +78,8 @@ public class Company implements Serializable {
         @XmlJavaTypeAdapter(LocalDateAdapter.class)
         private LocalDate endWork;
         private String description;
+
+        public static final Post EMPTY = new Post();
 
         public Post() {
         }

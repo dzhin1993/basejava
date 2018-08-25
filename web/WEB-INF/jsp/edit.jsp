@@ -3,6 +3,7 @@
 <%@ page import="model.CompanySection" %>
 <%@ page import="model.TextSection" %>
 <%@ page import="model.SectionType" %>
+<%@ page import="util.DateUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -32,54 +33,60 @@
         <c:forEach var="type" items="<%=SectionType.values()%>">
             <c:set var="section" value="${resume.getSection(type)}"/>
             <jsp:useBean id="section" type="model.Section"/>
+            <h2><a>${type.title}</a></h2>
             <c:choose>
-                <c:when test="${type=='PERSONAL'|| type=='OBJECTIVE'}">
-                    <dl>
-                        <dt>${type.title}</dt>
-                        <dd><input type="text" name="${type.name()}" size=30 value="<%=((TextSection)section).getContent()%>"></dd>
-                    </dl>
+                <c:when test="${type=='OBJECTIVE'}">
+                    <input type='text' name='${type}' size=75 value='<%=((TextSection) section).getContent()%>'>
                 </c:when>
-                <c:when test="${type=='ACHIEVEMENT'|| type=='QUALIFICATIONS'}">
-                    <dl>
-                        <dt>${type.title}</dt>
-                        <dd><textarea rows="3" cols="30" name="${type.name()}"><%=String.join("\n", ((ListSection)section).getContents())%></textarea></dd>
-                    </dl>
+                <c:when test="${type=='PERSONAL'}">
+                    <textarea name='${type}' cols=75 rows=5><%=((TextSection) section).getContent()%></textarea>
                 </c:when>
-                <c:when test="${type=='EXPERIENCE'|| type=='EDUCATION'}">
-                    <dl>
-                        <dt><h2>${type.title}</h2></dt><br/>
-                        <c:forEach var="company" items="<%=((CompanySection)section).getCompanies()%>">
-                            <dl>
-                                <dt>Компания</dt>
-                                <dd><input type="text" name="${type}companyName" size=30 value="${company.link.name}"></dd>
-                            </dl>
-                            <dl>
-                                <dt>Ссылка url</dt>
-                                <dd><input type="text" name="${type}url" size=30 value="${company.link.url}"></dd>
-                            </dl>
-                            <c:set var="companyID" value="${type}${company.link.name}"/>
-                            <h4>Список должностей:</h4>
+                <c:when test="${type=='QUALIFICATIONS' || type=='ACHIEVEMENT'}">
+                     <textarea name='${type}' cols=75
+                               rows=5><%=String.join("\n", ((ListSection) section).getContents())%>
+                     </textarea>
+                </c:when>
+                <c:when test="${type=='EXPERIENCE' || type=='EDUCATION'}">
+                    <c:forEach var="company" items="<%=((CompanySection) section).getCompanies()%>"
+                               varStatus="counter">
+                        <dl>
+                            <dt>Название учереждения:</dt>
+                            <dd><input type="text" name='${type}' size=100 value="${company.link.name}"></dd>
+                        </dl>
+                        <dl>
+                            <dt>Сайт учереждения:</dt>
+                            <dd><input type="text" name='${type}url' size=100 value="${company.link.url}"></dd>
+                        </dl>
+                        <br>
+                        <div style="margin-left: 30px">
                             <c:forEach var="post" items="${company.postList}">
+                                <jsp:useBean id="post" type="model.Company.Post"/>
                                 <dl>
-                                    <dt>Должность</dt>
-                                    <dd><input type="text" name="${companyID}position" size=30 value="${post.position}"></dd>
+                                    <dt>Начальная дата:</dt>
+                                    <dd>
+                                        <input type="text" name="${type}${counter.index}startDate" size=10
+                                               value="<%=DateUtil.format(post.getStartWork())%>" placeholder="MM/yyyy">
+                                    </dd>
                                 </dl>
                                 <dl>
-                                    <dt>Описание</dt>
-                                    <dd><input type="text" name="${companyID}description" size=30 value="${post.description}"></dd>
+                                    <dt>Конечная дата:</dt>
+                                    <dd>
+                                        <input type="text" name="${type}${counter.index}endDate" size=10
+                                               value="<%=DateUtil.format(post.getEndWork())%>" placeholder="MM/yyyy">
                                 </dl>
                                 <dl>
-                                    <dt>Начало работы</dt>
-                                    <dd><input type="text" name="${companyID}startWork" size=30 value="${post.startWork}"></dd>
+                                    <dt>Должность:</dt>
+                                    <dd><input type="text" name='${type}${counter.index}title' size=75
+                                               value="${post.position}">
                                 </dl>
                                 <dl>
-                                    <dt>Конец работы</dt>
-                                    <dd><input type="text" name="${companyID}endWork" size=30 value="${post.endWork}"></dd>
+                                    <dt>Описание:</dt>
+                                    <dd><textarea name="${type}${counter.index}description" rows=5
+                                                  cols=75>${post.description}</textarea></dd>
                                 </dl>
-                                <br/>
                             </c:forEach>
-                        </c:forEach>
-                    </dl>
+                        </div>
+                    </c:forEach>
                 </c:when>
             </c:choose>
         </c:forEach>

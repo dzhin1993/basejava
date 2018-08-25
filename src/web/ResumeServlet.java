@@ -4,6 +4,7 @@ import model.*;
 import storage.SqlStorage;
 import util.Config;
 import util.DateUtil;
+import util.HtmlUtil;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
@@ -40,53 +42,45 @@ public class ResumeServlet extends HttpServlet {
         }
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name());
-            switch (type) {
-                case PERSONAL:
-                case OBJECTIVE:
-                    if(!value.isEmpty()){
+            String[] values = request.getParameterValues(type.name());
+            if (HtmlUtil.isEmpty(value) && values.length < 2) {
+                r.getSections().remove(type);
+            } else {
+                switch (type) {
+                    case OBJECTIVE:
+                    case PERSONAL:
                         r.setSection(type, new TextSection(value));
-                    }
-                    break;
-                case ACHIEVEMENT:
-                case QUALIFICATIONS:
-                    if(!value.isEmpty()){
+                        break;
+                    case ACHIEVEMENT:
+                    case QUALIFICATIONS:
                         r.setSection(type, new ListSection(Arrays.asList(value.split("\n"))));
-                    }
-                    break;
-                case EXPERIENCE:
-                case EDUCATION:
-                    String[] companyNames = request.getParameterValues(type + "companyName");
-                    String[] companyURL = request.getParameterValues(type + "url");
-                    List<Company> companies = new ArrayList<>();
-                    for (int i = 0; i < companyNames.length; i++) {
-                        if (companyNames[i].isEmpty()) {
-                            continue;
-                        }
-                        String companyID = type + companyNames[i];
-                        Company company = new Company(companyNames[i], companyURL[i]);
-                        String[] positions = request.getParameterValues(companyID + "position");
-                        String[] descriptions = request.getParameterValues(companyID + "description");
-                        String[] datesStart = request.getParameterValues(companyID + "startWork");
-                        String[] datesEnd = request.getParameterValues(companyID + "endWork");
-                        List<Company.Post> posts = new ArrayList<>();
-                        if (positions != null) {
-                            for (int k = 0; k < positions.length; k++) {
-                                Company.Post post = new Company.Post(positions[k],
-                                        DateUtil.of(datesStart[k]),
-                                        DateUtil.of(datesEnd[k]),
-                                        descriptions[k]);
-                                posts.add(post);
+                        break;
+                    case EXPERIENCE:
+                    case EDUCATION:
+                        List<Company> companies = new ArrayList<>();
+                        String[] urls = request.getParameterValues(type.name() + "url");
+                        for (int i = 0; i < values.length; i++) {
+                            String name = values[i];
+                            if (!HtmlUtil.isEmpty(name)) {
+                                String pfx = type.name() + i;
+                                List<Company.Post> posts = new ArrayList<>();
+                                String[] startDates = request.getParameterValues(pfx + "startDate");
+                                String[] endDates = request.getParameterValues(pfx + "endDate");
+                                String[] titles = request.getParameterValues(pfx + "title");
+                                String[] descriptions = request.getParameterValues(pfx + "description");
+                                for (int j = 0; j < titles.length; j++) {
+                                    if (!HtmlUtil.isEmpty(titles[j])) {
+                                        posts.add(new Company.Post(titles[j], DateUtil.parse(startDates[j]), DateUtil.parse(endDates[j]), descriptions[j]));
+                                    }
+                                }
+                                Company company = new Company(name, urls[i]);
+                                company.setPostList(posts);
+                                companies.add(company);
                             }
-                            company.setPostList(posts);
                         }
-                        companies.add(company);
-                    }
-                    if(!companies.isEmpty()){
-                        CompanySection companySection = new CompanySection();
-                        companySection.setCompanies(companies);
-                        r.setSection(type, companySection);
-                    }
-                    break;
+                        r.setSection(type, new CompanySection(companies));
+                        break;
+                }
             }
         }
         sqlStorage.update(r);
@@ -112,21 +106,33 @@ public class ResumeServlet extends HttpServlet {
                 r = sqlStorage.get(uuid);
                 for (SectionType sectionType : SectionType.values()) {
                     Section section = r.getSection(sectionType);
-                    if (section == null) {
-                        switch (sectionType){
-                            case PERSONAL:
-                            case OBJECTIVE:
-                                r.setSection(sectionType, TextSection.TEXT_EMPTY);
-                                break;
-                            case ACHIEVEMENT:
-                            case QUALIFICATIONS:
-                                r.setSection(sectionType, ListSection.LIST_EMPTY);
-                                break;
-                            case EXPERIENCE:
-                            case EDUCATION:
-                                r.setSection(sectionType, CompanySection.COMPANY_EMPTY);
-                                break;
-                        }
+                    switch (sectionType) {
+                        case PERSONAL:
+                        case OBJECTIVE:
+                            if (section == null) {
+                                r.setSection(sectionType, new TextSection(""));
+                            }
+                            break;
+                        case ACHIEVEMENT:
+                        case QUALIFICATIONS:
+                            if (section == null) {
+                                r.setSection(sectionType, new ListSection(Collections.singletonList("")));
+                            }
+                            break;
+                        case EXPERIENCE:
+                        case EDUCATION:
+                            List<Company> emptyFirstCompanies = new ArrayList<>();
+                            emptyFirstCompanies.add(Company.EMPTY);
+                            if (section != null) {
+                                for (Company company : ((CompanySection) section).getCompanies()) {
+                                    List<Company.Post> emptyFirstPosts = new ArrayList<>();
+                                    emptyFirstPosts.add(Company.Post.EMPTY);
+                                    emptyFirstPosts.addAll(company.getPostList());
+                                    emptyFirstCompanies.add(new Company(company.getLink(), emptyFirstPosts));
+                                }
+                            }
+                            r.setSection(sectionType, new CompanySection(emptyFirstCompanies));
+                            break;
                     }
                 }
                 break;

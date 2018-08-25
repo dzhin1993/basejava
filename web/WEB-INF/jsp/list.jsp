@@ -1,7 +1,4 @@
 <%@ page import="model.ContactType" %>
-<%@ page import="model.SectionType" %>
-<%@ page import="model.TextSection" %>
-<%@ page import="model.ListSection" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
