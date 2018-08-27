@@ -30,8 +30,15 @@ public class ResumeServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
-        Resume r = sqlStorage.get(uuid);
-        r.setFullName(fullName);
+        final boolean isCreate = (uuid == null || uuid.length() == 0);
+        Resume r;
+        if (isCreate) {
+            r = new Resume(fullName);
+            sqlStorage.save(r);
+        } else {
+            r = sqlStorage.get(uuid);
+            r.setFullName(fullName);
+        }
         for (ContactType type : ContactType.values()) {
             String value = request.getParameter(type.name());
             if (value != null && value.trim().length() != 0) {
@@ -101,6 +108,9 @@ public class ResumeServlet extends HttpServlet {
                 sqlStorage.delete(uuid);
                 response.sendRedirect("resume");
                 return;
+            case "add":
+                r = Resume.EMPTY;
+                break;
             case "view":
             case "edit":
                 r = sqlStorage.get(uuid);
@@ -110,13 +120,13 @@ public class ResumeServlet extends HttpServlet {
                         case PERSONAL:
                         case OBJECTIVE:
                             if (section == null) {
-                                r.setSection(sectionType, new TextSection(""));
+                                section = TextSection.EMPTY;
                             }
                             break;
                         case ACHIEVEMENT:
                         case QUALIFICATIONS:
                             if (section == null) {
-                                r.setSection(sectionType, new ListSection(Collections.singletonList("")));
+                                section = ListSection.EMPTY;
                             }
                             break;
                         case EXPERIENCE:
@@ -131,9 +141,10 @@ public class ResumeServlet extends HttpServlet {
                                     emptyFirstCompanies.add(new Company(company.getLink(), emptyFirstPosts));
                                 }
                             }
-                            r.setSection(sectionType, new CompanySection(emptyFirstCompanies));
+                            section = new CompanySection(emptyFirstCompanies);
                             break;
                     }
+                    r.setSection(sectionType, section);
                 }
                 break;
             default:

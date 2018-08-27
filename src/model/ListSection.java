@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ListSection extends Section {
+    public static final ListSection EMPTY = new ListSection(Collections.singletonList(""));
     private List<String> contents;
 
     public ListSection() {
